@@ -1,6 +1,8 @@
 "use client";
 import { CopySimpleIcon, PlusCircleIcon } from "@phosphor-icons/react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const info = [
   {
@@ -15,17 +17,22 @@ const info = [
   },
   {
     title: "Lógica de programação para web 2023 com enfoque em responsividade",
-    code: "RFD945",
+    code: "RFD946",
     cover: "/cover-2.jpg",
   },
 ];
 
 export default function CriarTurma() {
+  const router = useRouter();
+
+  const handleCriarTurma = () => {
+    router.push("/criar-turma");
+  };
   return (
     <div className="p-10 max-w-[1250px] m-auto">
       <div className="grid grid-cols-3 gap-10 text-sm m-auto">
         <button
-          onClick={() => alert("oi")}
+          onClick={handleCriarTurma}
           className="border-dotted border-2 border-gray-700 rounded-lg h-[200px] cursor-pointer"
         >
           <div className="flex flex-col justify-center items-center gap-2">
@@ -34,9 +41,10 @@ export default function CriarTurma() {
           </div>
         </button>
         {info.map((turma) => (
-          <div
+          <Link
             key={turma.code}
             className="border-dotted border-2 border-gray-700 rounded-lg width-[200px] h-[200px] relative"
+            href={`/turma/${turma.code}`}
           >
             <Image
               src={turma.cover}
@@ -65,7 +73,7 @@ export default function CriarTurma() {
                 </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

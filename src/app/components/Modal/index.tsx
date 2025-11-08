@@ -35,12 +35,12 @@ export function Modal({
   return (
     <ReactModal
       isOpen={isOpen}
-      onRequestClose={onRequestClose}
+      onRequestClose={() => onRequestClose()}
       shouldCloseOnEsc
       className="w-[500px] bg-bege-logo rounded-md mx-auto mt-40 outline-none"
     >
       <div className="flex items-center justify-between bg-blue-logo p-4 rounded-t-md text-white">
-        <h2 className="font-bold text-xl">Cadastro de pergunta</h2>
+        <h2 className="font-bold text-xl">Adicionar pergunta</h2>
         <button
           onClick={onRequestClose}
           className="cursor-pointer hover:bg-red-500 rounded-md p-1"
@@ -54,10 +54,10 @@ export function Modal({
             <label htmlFor="statement" className="block text-sm font-medium">
               Enunciado
             </label>
-            <InputText
-              id="statement"
+            <textarea
               name="statement"
-              className="w-full bg-gray-50 border border-gray-200"
+              id="statement"
+              className="w-full bg-gray-50 border border-gray-200 rounded-md p-2 resize-none"
               placeholder="Enunciado da pergunta"
             />
           </div>
@@ -96,9 +96,9 @@ export function Modal({
           <div className="flex justify-end gap-4 pt-4">
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo"
             >
-              Salvar pergunta
+              Salvar
             </button>
           </div>
         </form>

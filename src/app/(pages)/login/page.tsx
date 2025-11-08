@@ -1,27 +1,36 @@
+"use client";
 import { InputText } from "@/app/components/InputText";
 import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/app/components/Button";
+import { InputPassword } from "@/app/components/InputPassword";
 
 export default function Login() {
   return (
-    <div className="min-w-[320px] text-purple-logo text-sm sm:p-24 max-w-xl m-auto min-h-screen flex items-center justify-center">
+    <div className="min-w-[320px] text-blue-logo text-sm sm:p-24 max-w-xl m-auto min-h-screen flex items-center justify-center">
       <form className="w-full flex flex-col gap-4 shadow-md rounded-3xl bg-white p-8">
-        <label htmlFor="email" className="flex flex-col gap-2">
-          Email
-          <InputText type="email" id="email" placeholder="Email" />
-        </label>
-        <label htmlFor="password" className="flex flex-col gap-2">
-          Senha
-          <InputText type="password" id="password" placeholder="Senha" />
-        </label>
-        <button
+        <Image
+          src="/favicon.png"
+          alt="Logo"
+          width={100}
+          height={100}
+          className="mx-auto my-[-20px]"
+        />
+        <h1 className="text-2xl font-bold text-blue-logo text-center">
+          Fazer login
+        </h1>
+        <InputText type="email" id="email" placeholder="Email" text="Email" />
+
+        <InputPassword />
+        <Button
           type="submit"
-          className=" text-white p-2 rounded-3xl shadow-md bg-gradient-to-r from-green-logo to-blue-logo disabled:from-gray-300 disabled:to-gray-400 hover:cursor-pointer hover:from-purple-300 hover:to-purple-400"
+          className="text-white bg-gradient-to-r from-green-logo to-blue-logo disabled:from-gray-300 disabled:to-gray-400 hover:cursor-pointer hover:from-secondary-purple hover:to-purple-logo"
         >
           Entrar
-        </button>
+        </Button>
         <Link
           href="/"
-          className="flex justify-center text-blue-logo p-2 rounded-3xl border-1 bg-transparent hover:bg-gradient-to-r  from-green-logo to-blue-logo  hover:cursor-pointer hover:text-white hover:shadow-md"
+          className="flex justify-center text-blue-logo p-2 px-4 py-2 border border-gray-300 rounded-md bg-gradient-to-r hover:from-secondary-purple hover:to-purple-logo hover:text-white cursor-pointer bg-transparent"
         >
           Criar nova conta
         </Link>

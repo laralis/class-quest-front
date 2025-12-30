@@ -22,7 +22,7 @@ interface Student {
 interface StudentHistory {
   studentId: string;
   name: string;
-  grades: (number | null)[]; // notas por unidade; null ou undefined = sem nota
+  grades: (number | null)[]; 
 }
 
 interface Assignment {

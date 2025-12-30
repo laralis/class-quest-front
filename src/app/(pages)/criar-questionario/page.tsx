@@ -61,15 +61,18 @@ export default function CriarQuestionario() {
             placeholder="Título do questionário"
             text="Título do questionário"
           />
-          <div className="space-y-2">
-            <label htmlFor="description" className="block text-sm font-medium">
+          <div className="relative flex-1">
+            <label
+              htmlFor="description"
+              className="absolute top-[-3px] left-[8] z-10 text-[11.5px] bg-white leading-2"
+            >
               Descrição
             </label>
             <textarea
               id="description"
               name="description"
-              className="w-full bg-gray-50 border border-gray-200 rounded-md p-2 min-h-[80px]"
               placeholder="Descrição do questionário"
+              className="w-full outline-none rounded-md  focus:border-blue-logo focus:bg-white bg-white border border-gray-200 p-2"
             />
           </div>
 

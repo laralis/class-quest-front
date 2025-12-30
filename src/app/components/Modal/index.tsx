@@ -4,7 +4,6 @@ import { Container } from "../Container";
 import { InputText } from "../InputText";
 import { useState } from "react";
 
-// Configuração do ReactModal para acessibilidade
 if (typeof window !== "undefined") {
   ReactModal.setAppElement("body");
 }
@@ -31,6 +30,7 @@ export function Modal({
     newOptions[index] = value;
     setOptions(newOptions);
   };
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
 
   return (
     <ReactModal
@@ -73,13 +73,16 @@ export function Modal({
                   placeholder={`Opção ${index + 1}`}
                 />
                 {options.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeOption(index)}
-                    className="p-2 text-red-500 hover:bg-red-100 rounded-md"
-                  >
-                    <TrashIcon size={20} />
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => removeOption(index)}
+                      className="p-2 text-red-500 hover:bg-red-100 rounded-md"
+                    >
+                      <TrashIcon size={20} />
+                    </button>
+                    <input type="radio" name={`option_${index}`} id={`option_${index}`} checked={selectedOption === index} onChange={() => setSelectedOption(index)} />
+                  </>
                 )}
               </div>
             ))}

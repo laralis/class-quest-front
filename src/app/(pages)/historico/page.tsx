@@ -17,7 +17,7 @@ interface ClassHistory {
 export default function HistoryPage() {
   const [selectedClass, setSelectedClass] = useState<string>('');
 
-  // Sample data - replace with actual data from your backend
+
   const classHistory: ClassHistory[] = [
     {
       className: 'Turma A',

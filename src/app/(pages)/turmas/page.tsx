@@ -15,11 +15,11 @@ const info = [
     code: "RFD945",
     cover: "/cover-2.jpg",
   },
-  {
-    title: "Lógica de programação para web 2023 com enfoque em responsividade",
-    code: "RFD946",
-    cover: "/cover-2.jpg",
-  },
+  // {
+  //   title: "Lógica de programação para web 2023 com enfoque em responsividade",
+  //   code: "RFD946",
+  //   cover: "/cover-2.jpg",
+  // },
 ];
 
 export default function CriarTurma() {

@@ -22,7 +22,7 @@ interface Student {
 interface StudentHistory {
   studentId: string;
   name: string;
-  grades: (number | null)[]; 
+  grades: (number | null)[];
 }
 
 interface Assignment {
@@ -81,7 +81,6 @@ export default function ClassDetail({
           </div>
         </div>
 
-        {/* Navigation Tabs */}
         <div className="border-b bg-white rounded-b-md">
           <div className="max-w-5xl mx-auto">
             <nav className="flex">
@@ -183,7 +182,7 @@ export default function ClassDetail({
               <h2 className="text-xl font-semibold mb-4">
                 Histórico dos Alunos
               </h2>
-              {/* calcular máximo de unidades presentes no histórico */}
+
               {(() => {
                 const maxUnits = Math.max(
                   0,

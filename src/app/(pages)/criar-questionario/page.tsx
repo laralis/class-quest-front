@@ -1,7 +1,7 @@
 "use client";
 import { Container } from "@/app/components/Container";
 import { InputText } from "@/app/components/InputText";
-import { Modal } from "@/app/components/Modal";
+import { Modal } from "./components/Modal";
 import {
   PlusIcon,
   PencilSimpleIcon,
@@ -14,10 +14,13 @@ import { useState } from "react";
 import { mockQuestionnaire } from "@/mocks/questionnaireData";
 import { Button } from "@/app/components/Button";
 import Link from "next/link";
+import { ButtonIcon } from "@/app/components/ButtonIcon";
+import { InputTextArea } from "@/app/components/InputTextArea";
 
 export default function CriarQuestionario() {
   const [questions, setQuestions] = useState(mockQuestionnaire.questions);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalAddOpen, setIsModalAddOpen] = useState(false);
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
 
   const moveQuestionUp = (index: number) => {
     if (index > 0) {
@@ -40,15 +43,25 @@ export default function CriarQuestionario() {
       setQuestions(newQuestions);
     }
   };
+  const deleteQuestion = (index: number) => {
+    const newQuestions = questions.filter((_, i) => i !== index);
+    setQuestions(newQuestions);
+  };
 
   return (
     <Container className="text-blue-logo mt-6 max-w-3xl">
       <Modal
-        isOpen={isModalOpen}
-        onRequestClose={() => setIsModalOpen(false)}
+        type="add"
+        isOpen={isModalAddOpen}
+        onRequestClose={() => setIsModalAddOpen(false)}
+      />
+      <Modal
+        type="edit"
+        isOpen={isModalEditOpen}
+        onRequestClose={() => setIsModalEditOpen(false)}
       />
       <div className="flex gap-2 items-center bg-blue-logo p-4 text-white rounded-t-lg">
-        <Link href="/turma" className="hover:bg-gray-600 p-2 rounded-md">
+        <Link href="/turma/1" className="hover:bg-logo-bege p-2 rounded-md">
           <CaretLeftIcon size={22} />
         </Link>
         <h1 className="text-3xl font-bold">Novo questionário</h1>
@@ -61,29 +74,21 @@ export default function CriarQuestionario() {
             placeholder="Título do questionário"
             text="Título do questionário"
           />
-          <div className="relative flex-1">
-            <label
-              htmlFor="description"
-              className="absolute top-[-3px] left-[8] z-10 text-[11.5px] bg-white leading-2"
-            >
-              Descrição
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              placeholder="Descrição do questionário"
-              className="w-full outline-none rounded-md  focus:border-blue-logo focus:bg-white bg-white border border-gray-200 p-2"
-            />
-          </div>
+          <InputTextArea
+            id="description"
+            name="description"
+            text="Descrição"
+            placeholder="Descrição do questionário"
+          />
 
-          <button
+          <Button
             type="button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsModalAddOpen(true)}
             className="flex items-center gap-2 bg-blue-logo text-white px-4 py-2 rounded-md hover:bg-purple-logo"
           >
             <PlusIcon size={20} weight="bold" />
-            Adicionar Nova Pergunta
-          </button>
+            Adicionar nova pergunta
+          </Button>
 
           <section className="space-y-4 mt-6">
             <h2 className="text-lg font-bold">Perguntas</h2>
@@ -99,37 +104,38 @@ export default function CriarQuestionario() {
                   </div>
                   <div className="flex gap-2">
                     <div className="flex flex-col">
-                      <button
+                      <ButtonIcon
+                        type="button"
                         title="Mover para cima"
-                        className="p-1 hover:bg-gray-200 rounded disabled:opacity-50"
                         onClick={() => moveQuestionUp(index)}
                         disabled={index === 0}
                       >
                         <CaretUpIcon size={20} />
-                      </button>
-                      <button
+                      </ButtonIcon>
+                      <ButtonIcon
+                        type="button"
                         title="Mover para baixo"
-                        className="p-1 hover:bg-gray-200 rounded disabled:opacity-50"
                         onClick={() => moveQuestionDown(index)}
                         disabled={index === questions.length - 1}
                       >
                         <CaretDownIcon size={20} />
-                      </button>
+                      </ButtonIcon>
                     </div>
-                    <button
+                    <ButtonIcon
+                      type="button"
                       title="Editar pergunta"
-                      className="p-1 hover:bg-gray-200 rounded"
-                      onClick={() => setIsModalOpen(true)}
+                      onClick={() => setIsModalEditOpen(true)}
                     >
                       <PencilSimpleIcon size={20} />
-                    </button>
-                    <button
+                    </ButtonIcon>
+                    <ButtonIcon
+                      type="button"
                       title="Excluir pergunta"
-                      className="p-1 hover:bg-gray-200 rounded"
-                      onClick={() => setIsModalOpen(true)}
+                      onClick={() => deleteQuestion(index)}
+                      className="text-red-logo"
                     >
                       <TrashIcon size={20} />
-                    </button>
+                    </ButtonIcon>
                   </div>
                 </div>
               </div>
@@ -137,12 +143,12 @@ export default function CriarQuestionario() {
           </section>
 
           <div className="flex justify-end gap-4 pt-4">
-            <button
-              type="reset"
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-500 hover:text-white cursor-pointer"
+            <Link
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white cursor-pointer"
+              href={"/turma/1"}
             >
               Cancelar
-            </button>
+            </Link>
             <Button
               type="submit"
               className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo cursor-pointer"

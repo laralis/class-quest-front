@@ -29,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
+        id="app-root"
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Header />

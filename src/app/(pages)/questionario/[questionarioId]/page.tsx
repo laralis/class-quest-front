@@ -62,7 +62,7 @@ export default function QuestionnairePage() {
             } questões`}</span>
             <button
               title="Fechar"
-              className="bg-transparent hover:bg-white hover:text-red-500 cursor-pointer rounded-md p-1"
+              className="bg-transparent hover:bg-white hover:text-red-logo cursor-pointer rounded-md p-1"
             >
               <XIcon size={22} weight="bold" />
             </button>

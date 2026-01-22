@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { useState, InputHTMLAttributes } from "react";
 import { InputText } from "../InputText";
 import { EyeClosedIcon, EyeIcon } from "@phosphor-icons/react";
 
-export function InputPassword() {
+export function InputPassword({
+  ...props
+}: InputHTMLAttributes<HTMLInputElement>) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="relative">
       <InputText
+        {...props}
         type={showPassword ? "text" : "password"}
         id="password"
         placeholder="Senha"
         required
-        text="Senha"
       />
       <button
         type="button"

@@ -1,12 +1,25 @@
 "use client";
 import { InputText } from "@/app/components/InputText";
-import { CopySimpleIcon, CheckIcon } from "@phosphor-icons/react";
+import { InputImage } from "@/app/components/InputImage";
+import { CheckIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import { SectionAddStudents } from "./components/SectionAddStudents";
 import { Button } from "@/app/components/Button";
 import { ToastContainer, toast } from "react-toastify";
+import { useState } from "react";
+import { InputTextArea } from "@/app/components/InputTextArea";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
 
 export default function CriarTurma() {
+  const [classImage, setClassImage] = useState<File | null>(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [units, setUnits] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { token } = useAuthStore();
+  const router = useRouter();
+
   const notifySuccess = () => {
     toast(
       () => (
@@ -22,38 +35,51 @@ export default function CriarTurma() {
       }
     );
   };
-  const notifyCopy = () => {
-    toast(
-      () => (
-        <span className="text-white font-light">
-          Código copiado com sucesso!
-        </span>
-      ),
-      {
-        closeButton: true,
-        style: { backgroundColor: "#7bb2d9" },
-        position: "bottom-right",
-        autoClose: 5000,
-        icon: (
-          <CopySimpleIcon
-            weight="fill"
-            size={22}
-            className="text-white"
-          />
-        ),
+
+  const notifyError = (message: string) => {
+    toast.error(message, {
+      position: "bottom-right",
+      autoClose: 5000,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("units", units);
+      if (classImage) {
+        formData.append("image", classImage);
       }
-    );
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    notifySuccess();
-  };
+      const response = await fetch("http://localhost:3300/class", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
 
-  const handleCopyClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    notifyCopy();
-    navigator.clipboard.writeText("HGX473");
+      if (response.ok) {
+        const data = await response.json();
+        notifySuccess();
+        setTimeout(() => {
+          router.push("/turmas");
+        }, 1500);
+      } else {
+        const error = await response.json();
+        notifyError(error.message || "Erro ao criar turma");
+      }
+    } catch (error) {
+      console.error("Erro ao criar turma:", error);
+      notifyError("Erro ao conectar com o servidor");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,33 +102,41 @@ export default function CriarTurma() {
             id="name"
             placeholder="Nome da turma"
             text="Nome"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <InputTextArea
+            type="text"
+            id="description"
+            placeholder="Descrição da turma"
+            text="Descrição"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
           />
           <InputText
             type="number"
             id="units"
             placeholder="Unidades"
             text="Numero de unidades"
+            value={units}
+            onChange={(e) => setUnits(e.target.value)}
+            required
+          />
+          <InputImage
+            id="classImage"
+            text="Imagem da turma"
+            onChange={setClassImage}
           />
 
-          <div className="flex gap-2">
-            <label htmlFor="code">Código:</label>
-            <span id="code">HGX473</span>
-            <button
-              type="button"
-              className="p-1 cursor-pointer m-[-1px]"
-              aria-label="Copiar código"
-              title="Copiar código"
-              onClick={handleCopyClick}
-            >
-              <CopySimpleIcon size={18} />
-            </button>
-          </div>
           <SectionAddStudents />
           <Button
             type="submit"
+            disabled={loading}
             className="text-white bg-gradient-to-r from-green-logo to-blue-logo disabled:from-gray-300 disabled:to-gray-400 hover:cursor-pointer hover:from-secondary-purple hover:to-purple-logo"
           >
-            Criar turma
+            {loading ? "Criando..." : "Criar turma"}
           </Button>
         </form>
       </div>

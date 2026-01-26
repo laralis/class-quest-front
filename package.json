@@ -10,11 +10,14 @@
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
+    "formik": "^2.4.9",
     "next": "15.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-modal": "^3.16.3",
     "react-toastify": "^11.0.5",
+    "zod": "^4.3.6",
+    "zod-formik-adapter": "^2.0.0",
     "zustand": "^5.0.10"
   },
   "devDependencies": {

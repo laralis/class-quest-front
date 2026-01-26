@@ -42,7 +42,6 @@ export function ModalEntrarTurma({
         onSuccess();
       } else {
         const data = await response.json();
-        console.log(data)
         toast.error(data.message || "Erro ao entrar na turma");
       }
     } catch (error) {

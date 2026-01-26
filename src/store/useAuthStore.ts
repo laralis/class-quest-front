@@ -43,7 +43,6 @@ export const useAuthStore = create<AuthState>()(
 
             const currentTime = Math.floor(Date.now() / 1000);
             if (payload.exp && payload.exp < currentTime) {
-              console.log("Token expirado, limpando autenticação");
               localStorage.removeItem("token");
               set({ token: null, user: null, isAuthenticated: false });
               return;
@@ -61,7 +60,6 @@ export const useAuthStore = create<AuthState>()(
               isAuthenticated: true,
             });
           } catch (error) {
-            console.error("Erro ao decodificar token:", error);
             localStorage.removeItem("token");
             set({ token: null, user: null, isAuthenticated: false });
           }

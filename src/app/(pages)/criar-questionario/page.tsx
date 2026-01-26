@@ -1,51 +1,232 @@
 "use client";
 import { Container } from "@/app/components/Container";
-import { InputText } from "@/app/components/InputText";
+import { CaretLeftIcon } from "@phosphor-icons/react";
+import { useState, useEffect, useCallback } from "react";
+import { useClassStore } from "@/store/useClassStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useActiveQuestionnaireStore } from "@/store/useActiveQuestionnaireStore";
+import { useQuestionStore } from "@/store/useQuestionStore";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { z } from "zod";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
 import { Modal } from "./components/Modal";
-import {
-  PlusIcon,
-  PencilSimpleIcon,
-  TrashIcon,
-  CaretUpIcon,
-  CaretDownIcon,
-  CaretLeftIcon,
-} from "@phosphor-icons/react";
-import { useState } from "react";
-import { mockQuestionnaire } from "@/mocks/questionnaireData";
-import { Button } from "@/app/components/Button";
-import Link from "next/link";
-import { ButtonIcon } from "@/app/components/ButtonIcon";
-import { InputTextArea } from "@/app/components/InputTextArea";
+import { QuestionnaireForm } from "./components/QuestionnaireForm";
+import { QuestionsList } from "./components/QuestionsList";
+import { useQuestionnaireActions } from "./hooks/useQuestionnaireActions";
+import { useQuestionsActions } from "./hooks/useQuestionsActions";
+
+const questionnaireSchema = z.object({
+  title: z
+    .string("Título é obrigatório")
+    .trim()
+    .min(3, "Título deve ter no mínimo 3 caracteres"),
+  description: z.string().optional().default(""),
+});
+
+interface Question {
+  id: number;
+  statement: string;
+  value: number;
+  available: boolean;
+  time: number | null;
+  order: number;
+  questionnaireId: number;
+}
 
 export default function CriarQuestionario() {
-  const [questions, setQuestions] = useState(mockQuestionnaire.questions);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [editingQuestionId, setEditingQuestionId] = useState<number | null>(
+    null,
+  );
+  const [isEditing, setIsEditing] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
-  const moveQuestionUp = (index: number) => {
-    if (index > 0) {
-      const newQuestions = [...questions];
-      [newQuestions[index], newQuestions[index - 1]] = [
-        newQuestions[index - 1],
-        newQuestions[index],
-      ];
-      setQuestions(newQuestions);
+  const { currentClassId, currentClassName } = useClassStore();
+  const { token } = useAuthStore();
+  const { activeQuestionnaire, clearActiveQuestionnaire } =
+    useActiveQuestionnaireStore();
+  const { shouldRefreshQuestions, resetRefresh } = useQuestionStore();
+  const router = useRouter();
+
+  const { updateQuestionnaire, createQuestionnaire } =
+    useQuestionnaireActions();
+
+  const formik = useFormik({
+    initialValues: {
+      title: "",
+      description: "",
+    },
+    validationSchema: toFormikValidationSchema(questionnaireSchema),
+    validateOnChange: true,
+    validateOnBlur: true,
+    onSubmit: async (values) => {
+      if (isEditing) {
+        await updateQuestionnaire(values, isReady, formik.setSubmitting);
+      } else {
+        const success = await createQuestionnaire(
+          values,
+          isReady,
+          currentClassId,
+          formik.setSubmitting,
+          setIsEditing,
+        );
+        if (!success) {
+          setIsEditing(false);
+        }
+      }
+    },
+  });
+  const fetchQuestions = useCallback(async () => {
+    if (!activeQuestionnaire?.id || !token) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3300/questionnaire/${activeQuestionnaire?.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+
+        if (data.questions && Array.isArray(data.questions)) {
+          setQuestions(
+            data.questions.sort(
+              (a: Question, b: Question) => a.order - b.order,
+            ),
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao buscar perguntas:", error);
+    }
+  }, [activeQuestionnaire?.id, token]);
+
+  useEffect(() => {
+    if (activeQuestionnaire?.id) {
+      setIsEditing(true);
+      fetchQuestionnaireData(activeQuestionnaire?.id);
+      fetchQuestions();
+    } else if (!currentClassId) {
+      toast.error("Nenhuma turma selecionada");
+      router.push("/turmas");
+    }
+  }, [currentClassId, router, activeQuestionnaire?.id]);
+
+  useEffect(() => {
+    return () => {
+      clearActiveQuestionnaire();
+    };
+  }, [clearActiveQuestionnaire]);
+
+  useEffect(() => {
+    if (shouldRefreshQuestions && activeQuestionnaire?.id) {
+      fetchQuestions();
+      resetRefresh();
+    }
+  }, [
+    shouldRefreshQuestions,
+    activeQuestionnaire?.id,
+    resetRefresh,
+    fetchQuestions,
+  ]);
+
+  const fetchQuestionnaireData = async (id: number) => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3300/questionnaire/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        formik.setFieldValue("title", data.title);
+        formik.setFieldValue("description", data.description || "");
+        setIsReady(data.ready || false);
+      } else {
+        toast.error("Erro ao carregar questionário");
+        router.push("/turmas");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar questionário:", error);
+      toast.error("Erro ao conectar com o servidor");
     }
   };
 
-  const moveQuestionDown = (index: number) => {
-    if (index < questions.length - 1) {
-      const newQuestions = [...questions];
-      [newQuestions[index], newQuestions[index + 1]] = [
-        newQuestions[index + 1],
-        newQuestions[index],
-      ];
-      setQuestions(newQuestions);
+  const { moveQuestionUp, moveQuestionDown, deleteQuestion } =
+    useQuestionsActions(fetchQuestions, questions, setQuestions);
+
+  const handleToggleReady = async (ready: boolean) => {
+    const validation = questionnaireSchema.safeParse(formik.values);
+    if (!validation.success) {
+      const errors = validation.error.flatten().fieldErrors;
+      const firstError = Object.values(errors)[0]?.[0];
+      toast.error(firstError || "Erro na validação do formulário");
+      return;
+    }
+
+    if (ready && questions.length === 0) {
+      toast.error("Adicione pelo menos uma pergunta antes de publicar");
+      return;
+    }
+
+    if (!activeQuestionnaire?.id) {
+      toast.error("Salve o questionário antes de alterar o status");
+      return;
+    }
+
+    formik.setSubmitting(true);
+
+    try {
+      const response = await fetch(
+        `http://localhost:3300/questionnaire/${activeQuestionnaire?.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ready,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        const statusMessage = ready
+          ? "Questionário publicado com sucesso!"
+          : "Questionário movido para rascunho!";
+        toast.success(statusMessage);
+        setIsReady(ready);
+      } else {
+        const error = await response.json();
+        toast.error(error.message || "Erro ao atualizar status");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      toast.error("Erro ao conectar com o servidor");
+    } finally {
+      formik.setSubmitting(false);
     }
   };
-  const deleteQuestion = (index: number) => {
-    const newQuestions = questions.filter((_, i) => i !== index);
-    setQuestions(newQuestions);
+
+  const handleEditQuestion = (questionId: number) => {
+    setEditingQuestionId(questionId);
+    setIsModalEditOpen(true);
   };
 
   return (
@@ -54,110 +235,66 @@ export default function CriarQuestionario() {
         type="add"
         isOpen={isModalAddOpen}
         onRequestClose={() => setIsModalAddOpen(false)}
+        questionnaireId={activeQuestionnaire?.id}
+        questionsCount={questions.length}
+        onQuestionAdded={fetchQuestions}
       />
       <Modal
         type="edit"
         isOpen={isModalEditOpen}
-        onRequestClose={() => setIsModalEditOpen(false)}
+        onRequestClose={() => {
+          setIsModalEditOpen(false);
+          setEditingQuestionId(null);
+        }}
+        questionnaireId={activeQuestionnaire?.id}
+        questionsCount={questions.length}
+        onQuestionAdded={fetchQuestions}
+        questionId={editingQuestionId}
       />
+
       <div className="flex gap-2 items-center bg-blue-logo p-4 text-white rounded-t-lg">
-        <Link href="/turma/1" className="hover:bg-logo-bege p-2 rounded-md">
+        <button
+          onClick={() => router.back()}
+          className="hover:bg-logo-bege p-2 rounded-md cursor-pointer"
+        >
           <CaretLeftIcon size={22} />
-        </Link>
-        <h1 className="text-3xl font-bold">Novo questionário</h1>
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold">
+            {isEditing ? "Editar questionário" : "Novo questionário"}
+          </h1>
+          {currentClassName && (
+            <p className="text-sm opacity-90">Turma: {currentClassName}</p>
+          )}
+        </div>
       </div>
-      <div className="bg-white  rounded-b-lg p-6 shadow-md mx-auto">
-        <form className="space-y-6">
-          <InputText
-            id="title"
-            name="title"
-            placeholder="Título do questionário"
-            text="Título do questionário"
-          />
-          <InputTextArea
-            id="description"
-            name="description"
-            text="Descrição"
-            placeholder="Descrição do questionário"
-          />
 
-          <Button
-            type="button"
-            onClick={() => setIsModalAddOpen(true)}
-            className="flex items-center gap-2 bg-blue-logo text-white px-4 py-2 rounded-md hover:bg-purple-logo"
-          >
-            <PlusIcon size={20} weight="bold" />
-            Adicionar nova pergunta
-          </Button>
+      <QuestionnaireForm formik={formik} isEditing={isEditing} />
 
-          <section className="space-y-4 mt-6">
-            <h2 className="text-lg font-bold">Perguntas</h2>
-            {questions.map((question, index) => (
-              <div
-                key={index}
-                className="bg-gray-50 p-4 rounded-lg border border-gray-200"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2 flex gap-2">
-                    <span className="text-sm text-gray-500">{index + 1}.</span>
-                    <h3 className="font-medium">{question.question}</h3>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="flex flex-col">
-                      <ButtonIcon
-                        type="button"
-                        title="Mover para cima"
-                        onClick={() => moveQuestionUp(index)}
-                        disabled={index === 0}
-                      >
-                        <CaretUpIcon size={20} />
-                      </ButtonIcon>
-                      <ButtonIcon
-                        type="button"
-                        title="Mover para baixo"
-                        onClick={() => moveQuestionDown(index)}
-                        disabled={index === questions.length - 1}
-                      >
-                        <CaretDownIcon size={20} />
-                      </ButtonIcon>
-                    </div>
-                    <ButtonIcon
-                      type="button"
-                      title="Editar pergunta"
-                      onClick={() => setIsModalEditOpen(true)}
-                    >
-                      <PencilSimpleIcon size={20} />
-                    </ButtonIcon>
-                    <ButtonIcon
-                      type="button"
-                      title="Excluir pergunta"
-                      onClick={() => deleteQuestion(index)}
-                      className="text-red-logo"
-                    >
-                      <TrashIcon size={20} />
-                    </ButtonIcon>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </section>
+      {(activeQuestionnaire?.id || isEditing) && (
+        <QuestionsList
+          questions={questions}
+          onAddQuestion={() => setIsModalAddOpen(true)}
+          onEditQuestion={handleEditQuestion}
+          onDeleteQuestion={deleteQuestion}
+          onMoveUp={moveQuestionUp}
+          onMoveDown={moveQuestionDown}
+          isReady={isReady}
+          onToggleReady={handleToggleReady}
+          isSubmitting={formik.isSubmitting}
+        />
+      )}
 
-          <div className="flex justify-end gap-4 pt-4">
-            <Link
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white cursor-pointer"
-              href={"/turma/1"}
-            >
-              Cancelar
-            </Link>
-            <Button
-              type="submit"
-              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo cursor-pointer"
-            >
-              Salvar
-            </Button>
-          </div>
-        </form>
-      </div>
+      {!activeQuestionnaire?.id && !isEditing && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+          <p className="text-blue-700 font-medium">
+            💡 Salve o rascunho do questionário para começar a adicionar
+            perguntas
+          </p>
+        </div>
+      )}
+
+      <ToastContainer position="bottom-right" />
     </Container>
   );
 }

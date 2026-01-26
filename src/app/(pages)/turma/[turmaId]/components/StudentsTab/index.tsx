@@ -11,10 +11,10 @@ interface Student {
 }
 
 interface StudentsTabProps {
-  turmaId: string;
+  classCode: string;
 }
 
-export function StudentsTab({ turmaId }: StudentsTabProps) {
+export function StudentsTab({ classCode }: StudentsTabProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
   const { token } = useAuthStore();
@@ -24,7 +24,7 @@ export function StudentsTab({ turmaId }: StudentsTabProps) {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:3300/class/students?accessCode=${turmaId}`,
+          `http://localhost:3300/class/students?accessCode=${classCode}`,
           {
             method: "GET",
             headers: {
@@ -46,15 +46,15 @@ export function StudentsTab({ turmaId }: StudentsTabProps) {
         setLoading(false);
       }
     };
-    if (token && turmaId) {
+    if (token && classCode) {
       fetchStudents();
     }
-  }, [token, turmaId]);
+  }, [token, classCode]);
 
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Alunos Matriculados</h2>
+        <h2 className="text-xl font-semibold mb-4">Alunos matriculados</h2>
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             Carregando alunos...

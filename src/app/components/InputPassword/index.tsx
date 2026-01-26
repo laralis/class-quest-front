@@ -2,9 +2,14 @@ import { useState, InputHTMLAttributes } from "react";
 import { InputText } from "../InputText";
 import { EyeClosedIcon, EyeIcon } from "@phosphor-icons/react";
 
+interface InputPasswordProps extends InputHTMLAttributes<HTMLInputElement> {
+  text?: string;
+}
+
 export function InputPassword({
+  text = "Senha",
   ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
+}: InputPasswordProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -12,9 +17,9 @@ export function InputPassword({
       <InputText
         {...props}
         type={showPassword ? "text" : "password"}
-        id="password"
-        placeholder="Senha"
+        text={text}
         required
+        placeholder="Senha"
       />
       <button
         type="button"

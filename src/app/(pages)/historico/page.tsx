@@ -1,56 +1,30 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-
-interface Grade {
-  studentName: string;
-  subject: string;
-  grade: number;
-  date: string;
-}
-
-interface ClassHistory {
-  className: string;
-  grades: Grade[];
-}
+import { useAuthStore } from "@/store/useAuthStore";
+import { useState } from "react";
 
 export default function HistoryPage() {
-  const [selectedClass, setSelectedClass] = useState<string>('');
+  const { user } = useAuthStore();
+  const [selectedClass, setSelectedClass] = useState<string>("");
 
-
-  const classHistory: ClassHistory[] = [
-    {
-      className: 'Turma A',
-      grades: [
-        { studentName: 'João Silva', subject: 'Matemática', grade: 8.5, date: '2025-10-01' },
-        { studentName: 'Maria Santos', subject: 'Matemática', grade: 9.0, date: '2025-10-01' },
-      ]
-    },
-    {
-      className: 'Turma B',
-      grades: [
-        { studentName: 'Pedro Souza', subject: 'Português', grade: 7.5, date: '2025-10-02' },
-        { studentName: 'Ana Lima', subject: 'Português', grade: 8.8, date: '2025-10-02' },
-      ]
-    }
-  ];
+  const isTeacher = user?.role === "teacher";
 
   return (
-    <div className="p-6">
+    <div className="p-10 max-w-[1250px] m-auto">
       <h1 className="text-2xl font-bold mb-6">Histórico de Notas por Turma</h1>
-      
+
       <div className="mb-4">
-        <select 
+        <select
           value={selectedClass}
           onChange={(e) => setSelectedClass(e.target.value)}
-          className="p-2 border rounded"
+          className="border rounded"
         >
           <option value="">Selecione uma turma</option>
-          {classHistory.map((ch) => (
+          {/* {classHistory.map((ch) => (
             <option key={ch.className} value={ch.className}>
               {ch.className}
             </option>
-          ))}
+          ))} */}
         </select>
       </div>
 
@@ -66,7 +40,7 @@ export default function HistoryPage() {
               </tr>
             </thead>
             <tbody>
-              {classHistory
+              {/* {classHistory
                 .find((ch) => ch.className === selectedClass)
                 ?.grades.map((grade, index) => (
                   <tr key={index}>
@@ -74,10 +48,10 @@ export default function HistoryPage() {
                     <td className="px-6 py-3 border">{grade.subject}</td>
                     <td className="px-6 py-3 border">{grade.grade}</td>
                     <td className="px-6 py-3 border">
-                      {new Date(grade.date).toLocaleDateString('pt-BR')}
+                      {new Date(grade.date).toLocaleDateString("pt-BR")}
                     </td>
                   </tr>
-                ))}
+                ))} */}
             </tbody>
           </table>
         </div>

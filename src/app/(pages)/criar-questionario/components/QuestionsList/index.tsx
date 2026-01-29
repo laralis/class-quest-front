@@ -16,6 +16,12 @@ interface Question {
   time: number | null;
   order: number;
   questionnaireId: number;
+  alternatives?: {
+    id: number;
+    text: string;
+    correct: boolean;
+    questionId: number;
+  }[];
 }
 
 interface QuestionsListProps {
@@ -66,14 +72,62 @@ export function QuestionsList({
               key={question.id}
               className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-blue-logo transition-colors"
             >
-              <div className="flex justify-between items-start">
-                <div className="space-y-2 flex gap-2">
-                  <span className="text-sm text-gray-500 font-semibold">
-                    {index + 1}.
-                  </span>
-                  <h3 className="font-medium">{question.statement}</h3>
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="bg-blue-logo text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      #{index + 1}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      {question.value}{" "}
+                      {question.value === 1 ? "ponto" : "pontos"}
+                    </span>
+                    {question.time && (
+                      <span className="text-sm text-gray-600">
+                        ⏱ {question.time}s
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-medium text-gray-800 mb-3">
+                    {question.statement}
+                  </h3>
+
+                  {question.alternatives &&
+                    question.alternatives.length > 0 && (
+                      <div className="space-y-2 ml-6 mt-3">
+                        {question.alternatives.map((alt, altIndex) => (
+                          <div
+                            key={alt.id}
+                            className={`flex items-start gap-2 p-2.5 rounded-md ${
+                              alt.correct
+                                ? "bg-green-50 border border-green-300"
+                                : "bg-white border border-gray-200"
+                            }`}
+                          >
+                            <span className="text-sm font-semibold text-gray-700 mt-0.5 min-w-[20px]">
+                              {String.fromCharCode(65 + altIndex)})
+                            </span>
+                            <span
+                              className={`text-sm flex-1 ${
+                                alt.correct
+                                  ? "font-medium text-green-800"
+                                  : "text-gray-700"
+                              }`}
+                            >
+                              {alt.text}
+                            </span>
+                            {alt.correct && (
+                              <span className="text-green-700 text-xs font-semibold bg-green-200 px-2.5 py-1 rounded-full whitespace-nowrap">
+                                ✓ Correta
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                 </div>
-                <div className="flex gap-2">
+
+                <div className="flex gap-2 ml-4">
                   <div className="flex flex-col">
                     <ButtonIcon
                       type="button"
@@ -145,10 +199,10 @@ export function QuestionsList({
                 questions.length === 0
                   ? "Adicione pelo menos uma pergunta para publicar"
                   : isSubmitting
-                  ? "Salvando..."
-                  : isReady
-                  ? "Mover para rascunho"
-                  : "Publicar questionário"
+                    ? "Salvando..."
+                    : isReady
+                      ? "Mover para rascunho"
+                      : "Publicar questionário"
               }
               aria-label={
                 isReady ? "Mover para rascunho" : "Publicar questionário"

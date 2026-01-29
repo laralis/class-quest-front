@@ -34,6 +34,12 @@ interface Question {
   time: number | null;
   order: number;
   questionnaireId: number;
+  alternatives?: {
+    id: number;
+    text: string;
+    correct: boolean;
+    questionId: number;
+  }[];
 }
 
 export default function CriarQuestionario() {
@@ -46,7 +52,7 @@ export default function CriarQuestionario() {
   const [isEditing, setIsEditing] = useState(false);
   const [isReady, setIsReady] = useState(false);
 
-  const { currentClassId, currentClassName } = useClassStore();
+  const { currentClassDetails } = useClassStore();
   const { token } = useAuthStore();
   const { activeQuestionnaire, clearActiveQuestionnaire } =
     useActiveQuestionnaireStore();
@@ -71,7 +77,7 @@ export default function CriarQuestionario() {
         const success = await createQuestionnaire(
           values,
           isReady,
-          currentClassId,
+          currentClassDetails.id,
           formik.setSubmitting,
           setIsEditing,
         );
@@ -81,6 +87,7 @@ export default function CriarQuestionario() {
       }
     },
   });
+
   const fetchQuestions = useCallback(async () => {
     if (!activeQuestionnaire?.id || !token) return;
 
@@ -113,19 +120,27 @@ export default function CriarQuestionario() {
   useEffect(() => {
     if (activeQuestionnaire?.id) {
       setIsEditing(true);
-      fetchQuestionnaireData(activeQuestionnaire?.id);
-      fetchQuestions();
-    } else if (!currentClassId) {
-      toast.error("Nenhuma turma selecionada");
+      formik.setFieldValue("title", activeQuestionnaire.title);
+      formik.setFieldValue(
+        "description",
+        activeQuestionnaire.description || "",
+      );
+      setIsReady(activeQuestionnaire.ready || false);
+
+      if (
+        activeQuestionnaire.questions &&
+        activeQuestionnaire.questions.length > 0
+      ) {
+        setQuestions(
+          activeQuestionnaire.questions.sort((a, b) => a.order - b.order),
+        );
+      } else {
+        fetchQuestions();
+      }
+    } else if (!currentClassDetails.id) {
       router.push("/turmas");
     }
-  }, [currentClassId, router, activeQuestionnaire?.id]);
-
-  useEffect(() => {
-    return () => {
-      clearActiveQuestionnaire();
-    };
-  }, [clearActiveQuestionnaire]);
+  }, [activeQuestionnaire?.id, currentClassDetails.id, router]);
 
   useEffect(() => {
     if (shouldRefreshQuestions && activeQuestionnaire?.id) {
@@ -139,53 +154,20 @@ export default function CriarQuestionario() {
     fetchQuestions,
   ]);
 
-  const fetchQuestionnaireData = async (id: number) => {
-    if (!token) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:3300/questionnaire/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        formik.setFieldValue("title", data.title);
-        formik.setFieldValue("description", data.description || "");
-        setIsReady(data.ready || false);
-      } else {
-        toast.error("Erro ao carregar questionário");
-        router.push("/turmas");
-      }
-    } catch (error) {
-      console.error("Erro ao buscar questionário:", error);
-      toast.error("Erro ao conectar com o servidor");
-    }
-  };
-
   const { moveQuestionUp, moveQuestionDown, deleteQuestion } =
     useQuestionsActions(fetchQuestions, questions, setQuestions);
 
   const handleToggleReady = async (ready: boolean) => {
-    const validation = questionnaireSchema.safeParse(formik.values);
-    if (!validation.success) {
-      const errors = validation.error.flatten().fieldErrors;
-      const firstError = Object.values(errors)[0]?.[0];
-      toast.error(firstError || "Erro na validação do formulário");
-      return;
-    }
-
     if (ready && questions.length === 0) {
       toast.error("Adicione pelo menos uma pergunta antes de publicar");
       return;
     }
 
-    if (!activeQuestionnaire?.id) {
-      toast.error("Salve o questionário antes de alterar o status");
+    const questionnaireId = activeQuestionnaire?.id;
+
+    if (!questionnaireId) {
+      toast.error("Erro: ID do questionário não encontrado");
+      console.error("activeQuestionnaire:", activeQuestionnaire);
       return;
     }
 
@@ -193,7 +175,7 @@ export default function CriarQuestionario() {
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${activeQuestionnaire?.id}`,
+        `http://localhost:3300/questionnaire/${questionnaireId}`,
         {
           method: "PUT",
           headers: {
@@ -229,6 +211,10 @@ export default function CriarQuestionario() {
     setIsModalEditOpen(true);
   };
 
+  const handleGoBack = () => {
+    clearActiveQuestionnaire();
+    router.back();
+  };
   return (
     <Container className="text-blue-logo mt-6 max-w-3xl">
       <Modal
@@ -254,7 +240,7 @@ export default function CriarQuestionario() {
 
       <div className="flex gap-2 items-center bg-blue-logo p-4 text-white rounded-t-lg">
         <button
-          onClick={() => router.back()}
+          onClick={handleGoBack}
           className="hover:bg-logo-bege p-2 rounded-md cursor-pointer"
         >
           <CaretLeftIcon size={22} />
@@ -263,9 +249,10 @@ export default function CriarQuestionario() {
           <h1 className="text-3xl font-bold">
             {isEditing ? "Editar questionário" : "Novo questionário"}
           </h1>
-          {currentClassName && (
-            <p className="text-sm opacity-90">Turma: {currentClassName}</p>
-          )}
+
+          <p className="text-sm opacity-90">
+            Turma: {currentClassDetails.name}
+          </p>
         </div>
       </div>
 

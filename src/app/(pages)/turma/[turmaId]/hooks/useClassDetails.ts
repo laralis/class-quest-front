@@ -3,11 +3,9 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useClassStore } from "@/store/useClassStore";
 import { useActiveQuestionnaireStore } from "@/store/useActiveQuestionnaireStore";
-import { ClassDetails } from "../utils/types";
 import { fetchClassByAccessCode } from "../services/classService";
 
 export function useClassDetails(accessCode: string) {
-  const [classDetails, setClassDetails] = useState<ClassDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const { token } = useAuthStore();
   const { setCurrentClass } = useClassStore();
@@ -16,13 +14,28 @@ export function useClassDetails(accessCode: string) {
   const router = useRouter();
 
   const loadClassDetails = async () => {
-    if (!accessCode || !token) return;
+    if (!accessCode || !token) {
+      setLoading(false);
+      return;
+    }
 
     setLoading(true);
     try {
       const data = await fetchClassByAccessCode(accessCode, token);
-      setClassDetails(data);
-      setCurrentClass(data.id, data.name);
+      console.log(data);
+      setCurrentClass({
+        id: data.id,
+        logoUrl: data.logoUrl,
+        createdAt: data.createdAt,
+        name: data.name,
+        description: data.description,
+        units: data.units,
+        accessCode: data.accessCode,
+        teacherId: data.teacherId,
+        teacher: data.teacher,
+        students: data.students,
+        questionnaires: data.questionnaires,
+      });
     } catch (error) {
       console.error("Erro ao conectar com o servidor:", error);
       router.push("/turmas");
@@ -42,5 +55,5 @@ export function useClassDetails(accessCode: string) {
     }
   }, [shouldRefreshQuestionnaires]);
 
-  return { classDetails, loading };
+  return { loading };
 }

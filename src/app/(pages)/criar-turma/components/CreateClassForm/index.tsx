@@ -7,7 +7,7 @@ import { useCreateClassForm } from "../../hooks/useCreateClassForm";
 import { FormField } from "../FormField";
 
 export function CreateClassForm() {
-  const { formik, classImage, setClassImage } = useCreateClassForm();
+  const { formik, setClassImage } = useCreateClassForm();
 
   return (
     <form
@@ -42,16 +42,6 @@ export function CreateClassForm() {
           placeholder="Descrição da turma"
           text="Descrição"
           {...formik.getFieldProps("description")}
-        />
-      </FormField>
-
-      <FormField error={formik.errors.units} touched={formik.touched.units}>
-        <InputText
-          type="number"
-          id="units"
-          placeholder="Unidades"
-          text="Numero de unidades"
-          {...formik.getFieldProps("units")}
         />
       </FormField>
 

@@ -1,20 +1,20 @@
 import { useRouter } from "next/navigation";
 import { CaretLeftIcon } from "@phosphor-icons/react";
-import { ClassDetails } from "../../utils/types";
+import { ClassDetails, useClassStore } from "@/store/useClassStore";
 
-interface ClassHeaderProps {
-  classDetails: ClassDetails;
-}
-
-export function ClassHeader({ classDetails }: ClassHeaderProps) {
+export function ClassHeader({ classDetails }: ClassDetails) {
   const router = useRouter();
-
+  const { clearCurrentClass } = useClassStore();
+  const handleGoBack = () => {
+    clearCurrentClass();
+    router.push("/turmas");
+  };
   return (
     <div className="bg-blue-logo text-white p-8 rounded-t-md">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => router.back()}
+            onClick={handleGoBack}
             className="hover:bg-logo-bege rounded-md cursor-pointer"
           >
             <CaretLeftIcon size={22} />

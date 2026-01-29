@@ -9,10 +9,12 @@ export function useQuestionnaireActions() {
 
   const updateQuestionnaire = async (
     values: { title: string; description: string },
-    ready: boolean,
-    setSubmitting: (isSubmitting: boolean) => void
-  ): Promise<boolean> => {
-    if (!activeQuestionnaire?.id) {
+    isReady: boolean,
+    setSubmitting: (isSubmitting: boolean) => void,
+  ) => {
+    if (!activeQuestionnaire?.id || !token) {
+      toast.error("Questionário não encontrado");
+      setSubmitting(false);
       return false;
     }
 
@@ -20,7 +22,7 @@ export function useQuestionnaireActions() {
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${activeQuestionnaire?.id}`,
+        `http://localhost:3300/questionnaire/${activeQuestionnaire.id}`,
         {
           method: "PUT",
           headers: {
@@ -30,14 +32,23 @@ export function useQuestionnaireActions() {
           body: JSON.stringify({
             title: values.title,
             description: values.description,
-            ready,
+            ready: isReady,
           }),
-        }
+        },
       );
 
       if (response.ok) {
         toast.success("Questionário atualizado com sucesso!");
-        triggerRefresh(); // Atualiza a lista
+
+        // Atualizar o estado do questionário ativo
+        setActiveQuestionnaire({
+          ...activeQuestionnaire,
+          title: values.title,
+          description: values.description,
+          ready: isReady,
+        });
+
+        triggerRefresh();
         return true;
       } else {
         const error = await response.json();
@@ -58,7 +69,7 @@ export function useQuestionnaireActions() {
     ready: boolean,
     currentClassId: number | null,
     setSubmitting: (isSubmitting: boolean) => void,
-    setIsEditing: (isEditing: boolean) => void
+    setIsEditing: (isEditing: boolean) => void,
   ): Promise<boolean> => {
     if (!currentClassId) {
       toast.error("ID da turma não encontrado");
@@ -84,7 +95,7 @@ export function useQuestionnaireActions() {
 
       if (response.ok) {
         const data = await response.json();
-        setActiveQuestionnaire(data.id);
+        setActiveQuestionnaire(data);
         setIsEditing(true);
         const statusMessage = ready
           ? "Questionário criado e publicado com sucesso!"

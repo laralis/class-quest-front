@@ -1,22 +1,81 @@
 import { create } from "zustand";
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  // password: string;
+  role: string;
+  registration: string;
+}
+
+interface Student {
+  id: number;
+  classId: number;
+  studentId: number;
+  student: User;
+}
+
+interface Questionnaire {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: string;
+  ready: boolean;
+  classId: number;
+  createdById: number;
+}
+
+export interface ClassDetails {
+  id: number | null;
+  logoUrl: string;
+  createdAt: string;
+  name: string;
+  description: string;
+  units: number;
+  accessCode: string;
+  teacherId: number | null;
+  teacher: User | null;
+  students: Student[];
+  questionnaires: Questionnaire[];
+}
+
 interface ClassState {
-  currentClassId: number | null;
-  currentClassName: string | null;
-  currentClassCode: string;
-  setCurrentClassCode: (classId: string) => void;
-  setCurrentClass: (classId: number, className: string) => void;
+  currentClassDetails: ClassDetails;
+  setCurrentClass: (classDetails: ClassDetails) => void;
   clearCurrentClass: () => void;
 }
 
 export const useClassStore = create<ClassState>((set) => ({
-  currentClassId: null,
-  currentClassName: null,
-  currentClassCode: "",
-  setCurrentClassCode: (classCode: string) =>
-    set({ currentClassCode: classCode }),
-  setCurrentClass: (classId: number, className: string) =>
-    set({ currentClassId: classId, currentClassName: className }),
+  currentClassDetails: {
+    id: null,
+    logoUrl: "",
+    createdAt: "",
+    name: "",
+    description: "",
+    units: 0,
+    accessCode: "",
+    teacherId: null,
+    teacher: null,
+    students: [],
+    questionnaires: [],
+  },
+  setCurrentClass: (classDetails: ClassDetails) =>
+    set({ currentClassDetails: classDetails }),
   clearCurrentClass: () =>
-    set({ currentClassId: null, currentClassName: null }),
+    set({
+      currentClassDetails: {
+        id: null,
+        logoUrl: "",
+        createdAt: "",
+        name: "",
+        description: "",
+        units: 0,
+        accessCode: "",
+        teacherId: null,
+        teacher: null,
+        students: [],
+        questionnaires: [],
+      },
+    }),
 }));

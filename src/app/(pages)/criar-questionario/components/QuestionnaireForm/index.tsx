@@ -71,8 +71,8 @@ export function QuestionnaireForm({
             {formik.isSubmitting
               ? "Salvando..."
               : isEditing
-              ? "Atualizar Rascunho"
-              : "Salvar Rascunho"}
+                ? "Atualizar"
+                : "Salvar"}
           </button>
         </div>
       </form>

@@ -7,11 +7,13 @@ import { CheckCircleIcon, InfoIcon } from "@phosphor-icons/react";
 import { QuestionnaireResult, UserAnswer } from "../../utils/types";
 import { Button } from "@/app/components/Button";
 import { useRouter } from "next/navigation";
+import { useHistoryStore } from "@/store/useHistoryStore";
 
 export function HistoryTab() {
   const { user, token } = useAuthStore();
   const [results, setResults] = useState<QuestionnaireResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setQuestionnaireId } = useHistoryStore();
 
   const router = useRouter();
 
@@ -121,9 +123,12 @@ export function HistoryTab() {
       </div>
     );
   }
-  const handleNavHistoric = () => {
+  const handleNavHistoric = (id) => {
+    setQuestionnaireId(id);
     router.push("/historico");
   };
+
+ 
 
   return (
     <div className="space-y-4">
@@ -192,7 +197,7 @@ export function HistoryTab() {
                 </div>
                 <Button
                   className="flex items-center gap-2"
-                  onClick={handleNavHistoric}
+                  onClick={() => handleNavHistoric(result.questionnaireId)}
                 >
                   <InfoIcon />
                   Ver detalhes

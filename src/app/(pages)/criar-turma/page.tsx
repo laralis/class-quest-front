@@ -8,7 +8,7 @@ export default function CriarTurma() {
       <div className="items-center justify-center text-blue-logo text-sm p-8 pb-20 sm:p-24 max-w-xl m-auto">
         <CreateClassForm />
       </div>
-      <ToastContainer closeButton theme="colored" position="bottom-right" />
+      <ToastContainer position="bottom-right" />
     </>
   );
 }

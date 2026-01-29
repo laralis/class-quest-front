@@ -10,6 +10,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { z } from "zod";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useEffect } from "react";
 
 const createAccountSchema = z
   .object({
@@ -40,11 +42,18 @@ const createAccountSchema = z
     {
       message: "Matrícula é obrigatória para alunos",
       path: ["registration"],
-    }
+    },
   );
 
 export default function CreateAccount() {
   const router = useRouter();
+  const { isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/turmas");
+    }
+  }, [isAuthenticated, router]);
 
   const formik = useFormik({
     initialValues: {

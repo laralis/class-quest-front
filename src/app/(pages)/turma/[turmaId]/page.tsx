@@ -1,30 +1,26 @@
 "use client";
 
 import { Container } from "@/app/components/Container";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useClassDetails } from "./hooks/useClassDetails";
 import { ClassHeader } from "./components/ClassHeader";
 import { TabNavigation } from "./components/TabNavigation";
 import { TabContent } from "./components/TabContent";
-import { CreateQuestionnaireButton } from "./components/CreateQuestionnaireButton";
 import { TabType } from "./utils/types";
 import { useClassStore } from "@/store/useClassStore";
+import { FloatingButtons } from "./components/FloatingButons";
+import { useParams } from "next/navigation";
+import { ToastContainer } from "react-toastify";
 
-export default function ClassDetail({
-  params,
-}: {
-  params: Promise<{ turmaId: string }>;
-}) {
+export default function ClassDetail() {
   const [activeTab, setActiveTab] = useState<TabType>("feed");
-  const { setCurrentClassCode, currentClassCode } = useClassStore();
+  const { currentClassDetails } = useClassStore();
+  const params = useParams();
+  const accessCode = params.turmaId as string;
 
-  useEffect(() => {
-    params.then((p) => setCurrentClassCode(p.turmaId));
-  }, [params]);
+  const { loading } = useClassDetails(accessCode);
 
-  const { classDetails, loading } = useClassDetails(currentClassCode);
-
-  if (loading || !classDetails) {
+  if (loading || !currentClassDetails.id) {
     return (
       <Container>
         <div className="text-center py-8 text-gray-500">Carregando...</div>
@@ -35,15 +31,12 @@ export default function ClassDetail({
   return (
     <Container>
       <div className="bg-gray-50 rounded-md">
-        <ClassHeader classDetails={classDetails} />
+        <ClassHeader classDetails={currentClassDetails} />
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-        <TabContent
-          activeTab={activeTab}
-          classDetails={classDetails}
-          accessCode={currentClassCode}
-        />
+        <TabContent activeTab={activeTab} classDetails={currentClassDetails} />
       </div>
-      <CreateQuestionnaireButton />
+      <FloatingButtons />
+      <ToastContainer position="bottom-right" />
     </Container>
   );
 }

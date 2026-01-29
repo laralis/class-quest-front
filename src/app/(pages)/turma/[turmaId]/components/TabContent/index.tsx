@@ -2,6 +2,7 @@ import { TabType, ClassDetails } from "../../utils/types";
 import { FeedTab } from "../FeedTab";
 import { StudentsTab } from "../StudentsTab";
 import { HistoryTab } from "../HistoryTab";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface TabContentProps {
   activeTab: TabType;
@@ -9,18 +10,19 @@ interface TabContentProps {
   accessCode: string;
 }
 
-export function TabContent({
-  activeTab,
-  classDetails,
-  accessCode,
-}: TabContentProps) {
+export function TabContent({ activeTab, classDetails }: TabContentProps) {
+  const { user } = useAuthStore();
+  const isStudent = user?.role === "student";
   return (
     <main className="max-w-5xl mx-auto p-6">
       {activeTab === "feed" && (
         <FeedTab questionnaires={classDetails.questionnaires} />
       )}
-      {activeTab === "students" && <StudentsTab classCode={accessCode} />}
-      {activeTab === "history" && <HistoryTab />}
+      {activeTab === "students" && (
+        <StudentsTab students={classDetails.students} />
+      )}
+
+      {activeTab === "history" && isStudent && <HistoryTab />}
     </main>
   );
 }

@@ -13,7 +13,7 @@ interface FeedTabProps {
 }
 
 export function FeedTab({ questionnaires }: FeedTabProps) {
-  const { setActiveQuestionnaire, triggerRefresh, activeQuestionnaire } =
+  const { setActiveQuestionnaire, triggerRefresh } =
     useActiveQuestionnaireStore();
   const { user, token } = useAuthStore();
   const router = useRouter();
@@ -24,18 +24,97 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
     ? questionnaires
     : questionnaires.filter((q) => q.ready);
 
-  const handleEdit = () => {
-    router.push("/criar-questionario");
+  const handleEdit = async (questionnaire: Questionnaire) => {
+    try {
+      toast.info("Carregando questionário...");
+
+      const response = await fetch(
+        `http://localhost:3300/questionnaire/${questionnaire.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        toast.error("Erro ao carregar questionário");
+        return;
+      }
+
+      const data = await response.json();
+
+      interface QuestionWithAlternatives extends Question {
+        alternatives: Alternative[];
+      }
+
+      const questionsWithAlternatives: QuestionWithAlternatives[] =
+        await Promise.all(
+          (data.questions || []).map(async (question: Question) => {
+            try {
+              const questionResponse = await fetch(
+                `http://localhost:3300/question/${question.id}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                },
+              );
+
+              if (questionResponse.ok) {
+                const questionData = await questionResponse.json();
+
+                return {
+                  id: questionData.id,
+                  statement: questionData.statement,
+                  value: questionData.value,
+                  available: questionData.available,
+                  time: questionData.time,
+                  order: questionData.order,
+                  questionnaireId: questionData.questionnaireId,
+                  alternatives: questionData.alternative || [],
+                };
+              }
+              return {
+                ...question,
+                alternatives: [],
+              };
+            } catch (error) {
+              console.error(`Erro ao buscar questão ${question.id}:`, error);
+              return {
+                ...question,
+                alternatives: [],
+              };
+            }
+          }),
+        );
+
+      const questionnaireData = {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        ready: data.ready,
+        classId: data.classId,
+        questions: questionsWithAlternatives.sort((a, b) => a.order - b.order),
+      };
+
+      console.log("Setting activeQuestionnaire:", questionnaireData);
+      setActiveQuestionnaire(questionnaireData);
+      router.push("/criar-questionario");
+    } catch (error) {
+      console.error("Erro ao buscar questionário:", error);
+      toast.error("Erro ao conectar com o servidor");
+    }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (qid: number) => {
     if (!confirm("Tem certeza que deseja excluir este questionário?")) {
       return;
     }
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${activeQuestionnaire?.id}`,
+        `http://localhost:3300/questionnaire/${qid}`,
         {
           method: "DELETE",
           headers: {
@@ -201,14 +280,20 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
             {isTeacher && (
               <div className="flex gap-2">
                 <ButtonIcon
-                  onClick={() => handleEdit()}
+                  onClick={() => {
+                    setActiveQuestionnaire(questionnaire as any);
+                    handleEdit(questionnaire);
+                  }}
                   title="Editar questionário"
                   className="text-blue-logo hover:bg-blue-50"
                 >
                   <PencilSimpleIcon size={20} />
                 </ButtonIcon>
                 <ButtonIcon
-                  onClick={() => handleDelete()}
+                  onClick={() => {
+                    setActiveQuestionnaire(questionnaire as any);
+                    handleDelete(questionnaire.id);
+                  }}
                   title="Excluir questionário"
                   className="text-red-logo hover:bg-red-50"
                 >

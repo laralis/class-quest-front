@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/store/useAuthStore";
 import { TabType } from "../../utils/types";
 
 interface TabNavigationProps {
@@ -6,10 +7,13 @@ interface TabNavigationProps {
 }
 
 export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
+  const { user } = useAuthStore();
+  const isStudent = user?.role === "student";
+
   const tabs: { id: TabType; label: string }[] = [
     { id: "feed", label: "Feed" },
     { id: "students", label: "Alunos" },
-    { id: "history", label: "Histórico" },
+    ...(isStudent ? [{ id: "history" as TabType, label: "Histórico" }] : []),
   ];
 
   return (

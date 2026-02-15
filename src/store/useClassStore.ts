@@ -42,7 +42,9 @@ export interface ClassDetails {
 
 interface ClassState {
   currentClassDetails: ClassDetails;
+  releaseResult: boolean;
   setCurrentClass: (classDetails: ClassDetails) => void;
+  setReleaseResult: () => void;
   clearCurrentClass: () => void;
 }
 
@@ -60,8 +62,12 @@ export const useClassStore = create<ClassState>((set) => ({
     students: [],
     questionnaires: [],
   },
+  releaseResult: false,
   setCurrentClass: (classDetails: ClassDetails) =>
     set({ currentClassDetails: classDetails }),
+  setReleaseResult: () => {
+    set({ releaseResult: true });
+  },
   clearCurrentClass: () =>
     set({
       currentClassDetails: {
@@ -77,5 +83,6 @@ export const useClassStore = create<ClassState>((set) => ({
         students: [],
         questionnaires: [],
       },
+      releaseResult: false,
     }),
 }));

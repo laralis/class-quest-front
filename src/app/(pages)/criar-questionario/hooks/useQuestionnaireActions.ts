@@ -22,7 +22,7 @@ export function useQuestionnaireActions() {
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${activeQuestionnaire.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire/${activeQuestionnaire.id}`,
         {
           method: "PUT",
           headers: {
@@ -79,19 +79,22 @@ export function useQuestionnaireActions() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:3300/questionnaire", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            title: values.title,
+            description: values.description,
+            classId: currentClassId,
+            ready,
+          }),
         },
-        body: JSON.stringify({
-          title: values.title,
-          description: values.description,
-          classId: currentClassId,
-          ready,
-        }),
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();

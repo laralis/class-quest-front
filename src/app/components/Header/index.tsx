@@ -17,13 +17,16 @@ export function Header() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:3300/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         clearAuth();
@@ -38,14 +41,16 @@ export function Header() {
 
   return (
     <header className="w-full bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div
-          className={`flex h-16 ${
+          className={`flex h-14 sm:h-16 items-center ${
             isAuthenticated ? "justify-between" : "justify-center"
           }`}
         >
           {isAuthenticated && (
-            <div className="text-lg p-4">Olá, {user?.name}</div>
+            <div className="text-xs sm:text-sm md:text-base lg:text-lg p-2 sm:p-3 md:p-4 truncate max-w-[30%] sm:max-w-none">
+              Olá, {user?.name}
+            </div>
           )}
           <div className="flex-shrink-0 flex items-center">
             <Image
@@ -53,20 +58,24 @@ export function Header() {
               alt={"Logo"}
               width={150}
               height={60}
-              className="bg-transparent"
+              className="bg-transparent w-24 h-auto sm:w-32 md:w-40 lg:w-[150px]"
             />
           </div>
           {isAuthenticated && (
-            <div className="p-4">
+            <div className="p-2 sm:p-3 md:p-4">
               <button
                 onClick={handleLogout}
-                className="text-black px-4 py-2 rounded-md hover:bg-background transition cursor-pointer"
+                className="text-black px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-md hover:bg-background transition cursor-pointer"
+                title="Sair"
               >
                 <SignOutIcon
-                  className="inline-block mr-2"
-                  size={25}
+                  className="inline-block sm:mr-2"
+                  size={20}
                   alt="Sair"
                 />
+                <span className="hidden sm:inline text-sm md:text-base">
+                  Sair
+                </span>
               </button>
             </div>
           )}

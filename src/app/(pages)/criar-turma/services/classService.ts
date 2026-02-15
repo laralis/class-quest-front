@@ -1,13 +1,24 @@
 import { CreateClassFormData } from "../utils/schema";
 
-export async function createClass(data: CreateClassFormData, token: string) {
-  const response = await fetch("http://localhost:3300/class", {
+export async function createClass(
+  data: CreateClassFormData,
+  image: File | null,
+  token: string,
+) {
+  const formData = new FormData();
+  formData.append("name", data.name);
+  formData.append("description", data.description || "");
+
+  if (image) {
+    formData.append("image", image);
+  }
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/class`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: formData,
   });
 
   if (!response.ok) {

@@ -1,4 +1,4 @@
-import { QuestionnaireHistory } from "../utils/types";
+import { QuestionnaireHistory } from "../../utils/types";
 
 interface QuestionnaireListProps {
   questionnaires: QuestionnaireHistory[];

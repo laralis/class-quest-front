@@ -12,16 +12,16 @@ export function LoginForm() {
   return (
     <form
       onSubmit={formik.handleSubmit}
-      className="w-full flex flex-col gap-4 shadow-md rounded-3xl bg-white p-8"
+      className="w-full flex flex-col gap-3 sm:gap-4 shadow-md rounded-2xl sm:rounded-3xl bg-white p-6 sm:p-8"
     >
       <Image
         src="/favicon.png"
         alt="Logo"
         width={100}
         height={100}
-        className="mx-auto my-[-20px]"
+        className="mx-auto my-[-20px] w-20 h-20 sm:w-[100px] sm:h-[100px]"
       />
-      <h1 className="text-2xl font-bold text-blue-logo text-center">
+      <h1 className="text-xl sm:text-2xl font-bold text-blue-logo text-center">
         Fazer login
       </h1>
 
@@ -45,13 +45,13 @@ export function LoginForm() {
       <Button
         type="submit"
         disabled={formik.isSubmitting}
-        className="text-white bg-gradient-to-r from-green-logo to-blue-logo disabled:from-gray-300 disabled:to-gray-400 hover:cursor-pointer hover:from-secondary-purple hover:to-purple-logo"
+        className="text-sm sm:text-base text-white bg-gradient-to-r from-green-logo to-blue-logo disabled:from-gray-300 disabled:to-gray-400 hover:cursor-pointer hover:from-secondary-purple hover:to-purple-logo"
       >
         {formik.isSubmitting ? "Entrando..." : "Entrar"}
       </Button>
       <Link
         href="/"
-        className="flex justify-center text-blue-logo p-2 px-4 py-2 border border-gray-300 rounded-md bg-gradient-to-r hover:from-secondary-purple hover:to-purple-logo hover:text-white cursor-pointer bg-transparent"
+        className="flex justify-center text-sm sm:text-base text-blue-logo p-2 px-4 py-2 border border-gray-300 rounded-md bg-gradient-to-r hover:from-secondary-purple hover:to-purple-logo hover:text-white cursor-pointer bg-transparent"
       >
         Criar nova conta
       </Link>

@@ -13,10 +13,23 @@ export default function CriarTurma() {
 
   return (
     <>
-      <div className="p-10 max-w-[1250px] m-auto">
+      <div className="p-4 sm:p-6 md:p-10 max-w-[1250px] m-auto">
         <ClassesGrid classes={classes} onModalSuccess={reloadClasses} />
       </div>
-      <ToastContainer position="bottom-right" />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        progressClassName="!bg-blue-logo"
+        className="text-sm sm:text-base"
+      />
     </>
   );
 }

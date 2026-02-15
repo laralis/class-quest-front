@@ -16,7 +16,7 @@ export default function Login() {
   }, [isAuthenticated, initAuth, router]);
 
   return (
-    <div className="min-w-[320px] text-blue-logo text-sm sm:p-24 max-w-xl m-auto min-h-screen flex items-center justify-center">
+    <div className="min-w-[320px] text-blue-logo text-sm p-4 sm:p-8 md:p-24 max-w-xl m-auto min-h-screen flex items-center justify-center">
       <LoginForm />
     </div>
   );

@@ -5,9 +5,9 @@ interface LoginResponse {
 }
 
 export async function login(
-  credentials: LoginFormData
+  credentials: LoginFormData,
 ): Promise<LoginResponse> {
-  const response = await fetch("http://localhost:3300/login", {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
     method: "POST",
     credentials: "include",
     headers: {

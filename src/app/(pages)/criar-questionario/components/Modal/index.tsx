@@ -88,12 +88,12 @@ export function Modal({
 
     try {
       const response = await fetch(
-        `http://localhost:3300/question/${questionId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/question/${questionId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -106,11 +106,11 @@ export function Modal({
         if (data.options && data.options.length > 0) {
           setOptions(
             data.options.map(
-              (opt: { text: string; correct: boolean }) => opt.text
-            )
+              (opt: { text: string; correct: boolean }) => opt.text,
+            ),
           );
           const correctIndex = data.options.findIndex(
-            (opt: { text: string; correct: boolean }) => opt.correct
+            (opt: { text: string; correct: boolean }) => opt.correct,
           );
           setSelectedOption(correctIndex !== -1 ? correctIndex : null);
         }
@@ -150,7 +150,7 @@ export function Modal({
     try {
       if (type === "edit" && questionId) {
         const updateResponse = await fetch(
-          `http://localhost:3300/question/${questionId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/question/${questionId}`,
           {
             method: "PUT",
             headers: {
@@ -162,7 +162,7 @@ export function Modal({
               value,
               time: hasTimer && timeSeconds ? Number(timeSeconds) : null,
             }),
-          }
+          },
         );
 
         if (!updateResponse.ok) {
@@ -186,14 +186,17 @@ export function Modal({
           questionnaireId,
         };
 
-        const questionResponse = await fetch("http://localhost:3300/question", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+        const questionResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/question`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(questionPayload),
           },
-          body: JSON.stringify(questionPayload),
-        });
+        );
 
         const questionResponseText = await questionResponse.text();
 
@@ -201,7 +204,7 @@ export function Modal({
           try {
             const error = JSON.parse(questionResponseText);
             toast.error(
-              error.details || error.message || "Erro ao criar pergunta"
+              error.details || error.message || "Erro ao criar pergunta",
             );
           } catch {
             toast.error("Erro ao criar pergunta: Erro no servidor");
@@ -232,7 +235,7 @@ export function Modal({
             };
 
             const optionResponse = await fetch(
-              "http://localhost:3300/alternative",
+              `${process.env.NEXT_PUBLIC_API_URL}/alternative`,
               {
                 method: "POST",
                 headers: {
@@ -240,7 +243,7 @@ export function Modal({
                   Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(optionData),
-              }
+              },
             );
 
             const responseText = await optionResponse.text();
@@ -258,11 +261,11 @@ export function Modal({
                 toast.error(
                   `Erro ao criar alternativa ${i + 1}: ${
                     errorData.message || "Erro desconhecido"
-                  }`
+                  }`,
                 );
               } catch {
                 toast.error(
-                  `Erro ao criar alternativa ${i + 1}: Erro no servidor`
+                  `Erro ao criar alternativa ${i + 1}: Erro no servidor`,
                 );
               }
             }
@@ -279,7 +282,7 @@ export function Modal({
           onRequestClose();
         } else {
           toast.warning(
-            `Pergunta criada, mas apenas ${optionsCreated} de ${filledOptions.length} alternativas foram adicionadas`
+            `Pergunta criada, mas apenas ${optionsCreated} de ${filledOptions.length} alternativas foram adicionadas`,
           );
         }
       }
@@ -298,11 +301,11 @@ export function Modal({
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       shouldCloseOnEsc
-      overlayClassName="fixed inset-0 z-[9999] flex items-start justify-center bg-black/40"
-      className="relative z-[10000] w-[500px] bg-white border-bege-logo border-2 rounded-md mx-auto mt-[5%] outline-none"
+      overlayClassName="fixed inset-0 z-[9999] flex items-start justify-center bg-black/40 p-4 overflow-y-auto"
+      className="relative z-[10000] w-full max-w-[500px] bg-white border-bege-logo border-2 rounded-md mx-auto my-4 sm:mt-[5%] outline-none"
     >
-      <div className="flex items-center justify-between bg-blue-logo p-4 rounded-t-md text-white">
-        <h2 className="font-bold text-2xl">
+      <div className="flex items-center justify-between bg-blue-logo p-3 sm:p-4 rounded-t-md text-white">
+        <h2 className="font-bold text-lg sm:text-xl md:text-2xl">
           {type === "add" ? "Adicionar pergunta" : "Editar pergunta"}
         </h2>
         <ButtonIcon
@@ -310,17 +313,20 @@ export function Modal({
           className="hover:bg-red-logo"
           aria-label="Fechar modal"
         >
-          <XIcon size={22} weight="bold" />
+          <XIcon size={20} weight="bold" className="sm:w-[22px] sm:h-[22px]" />
         </ButtonIcon>
       </div>
 
       <Container>
-        <form className="space-y-2 p-2" onSubmit={handleSubmit}>
+        <form
+          className="space-y-3 sm:space-y-4 p-3 sm:p-4"
+          onSubmit={handleSubmit}
+        >
           <InputTextArea
             name="statement"
             id="statement"
             text="Enunciado"
-            className="w-full bg-gray-50 border border-gray-200 rounded-md resize-none"
+            className="w-full bg-gray-50 border border-gray-200 rounded-md resize-none text-sm sm:text-base"
             placeholder="Enunciado da pergunta"
             value={statement}
             onChange={(e) => setStatement(e.target.value)}
@@ -340,15 +346,17 @@ export function Modal({
             required
           />
 
-          <div className="space-y-4">
-            <label className="block text-m">Alternativas</label>
+          <div className="space-y-3 sm:space-y-4">
+            <label className="block text-sm sm:text-base font-medium">
+              Alternativas
+            </label>
             <div className="space-y-2">
               {options.map((option, index) => (
                 <div key={index} className="flex gap-2 items-center">
                   <InputText
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
-                    className="w-full bg-logo-bege border border-gray-200"
+                    className="w-full bg-logo-bege border border-gray-200 text-sm sm:text-base"
                     placeholder={`Alternativa ${index + 1}`}
                   />
                   {options.length > 1 && (
@@ -356,10 +364,10 @@ export function Modal({
                       <ButtonIcon
                         type="button"
                         onClick={() => removeOption(index)}
-                        className="text-red-logo"
+                        className="text-red-logo flex-shrink-0"
                         aria-label={`Remover alternativa ${index + 1}`}
                       >
-                        <TrashIcon size={20} />
+                        <TrashIcon size={18} className="sm:w-5 sm:h-5" />
                       </ButtonIcon>
 
                       <InputRadio
@@ -377,7 +385,7 @@ export function Modal({
               <Button
                 type="button"
                 onClick={addOption}
-                className={`flex items-center gap-2 ${
+                className={`flex items-center gap-2 text-sm sm:text-base ${
                   maxOptionsReached
                     ? "opacity-50 cursor-default! hover:bg-gray-500!"
                     : ""
@@ -389,15 +397,17 @@ export function Modal({
                     : "Adicionar opção"
                 }
               >
-                <PlusIcon size={20} />
+                <PlusIcon size={18} className="sm:w-5 sm:h-5" />
                 Adicionar opção
               </Button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-4 my-2">
+          <div className="flex flex-col gap-3 sm:gap-4 my-2">
             <div className="flex items-center gap-3">
-              <label className="block text-m">Temporizador</label>
+              <label className="block text-sm sm:text-base font-medium">
+                Temporizador
+              </label>
               <InputCheckbox
                 checked={hasTimer}
                 onChange={(e) => setHasTimer(e.target.checked)}
@@ -418,22 +428,22 @@ export function Modal({
                     : Math.max(0, Number(e.target.value));
                 setTimeSeconds(val === "" ? "" : Number(val));
               }}
-              className={`w-48 ${hasTimer ? "" : "hidden"}`}
+              className={`w-full sm:w-48 text-sm sm:text-base ${hasTimer ? "" : "hidden"}`}
             />
           </div>
 
-          <div className="flex justify-end gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
             <Button
               type="button"
               onClick={onRequestClose}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white"
+              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white text-sm sm:text-base w-full sm:w-auto"
               disabled={loading}
             >
               Cancelar
             </Button>
             <Button
               type="submit"
-              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo disabled:opacity-50"
+              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo disabled:opacity-50 text-sm sm:text-base w-full sm:w-auto"
               disabled={loading}
             >
               {loading ? "Salvando..." : "Salvar"}

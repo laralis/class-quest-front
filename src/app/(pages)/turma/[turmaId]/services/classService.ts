@@ -6,7 +6,7 @@ export async function fetchClassByAccessCode(
   token: string,
 ): Promise<ClassDetails> {
   const response = await fetch(
-    `http://localhost:3300/class/find?accessCode=${accessCode}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/class/find?accessCode=${accessCode}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -20,8 +20,26 @@ export async function fetchClassByAccessCode(
 
   return response.json();
 }
+export async function getClassGrades(
+  classId: number,
+  studentId: number,
+  token: string,
+): Promise<any> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/results/${classId}/final-grade/${studentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 
+  if (!response.ok) {
+    throw new Error("Erro ao buscar nota final");
+  }
 
+  return response.json();
+}
 
 export async function deleteClass(
   id: number | null,
@@ -38,13 +56,16 @@ export async function deleteClass(
   }
 
   try {
-    const response = await fetch(`http://localhost:3300/class/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/class/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (response.ok) {
       toast.success("Turma excluida com sucesso!");

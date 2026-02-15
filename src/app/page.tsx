@@ -69,21 +69,24 @@ export default function CreateAccount() {
     validateOnBlur: true,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const response = await fetch("http://localhost:3300/user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: values.name,
-            email: values.email,
-            password: values.password,
-            role: values.role,
-            ...(values.role === "student" && {
-              registration: values.registration,
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/user`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: values.name,
+              email: values.email,
+              password: values.password,
+              role: values.role,
+              ...(values.role === "student" && {
+                registration: values.registration,
+              }),
             }),
-          }),
-        });
+          },
+        );
 
         if (response.ok) {
           toast.success("Conta criada com sucesso!");
@@ -225,7 +228,20 @@ export default function CreateAccount() {
           Já tenho uma conta
         </Link>
       </form>
-      <ToastContainer position="bottom-right" />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        progressClassName="!bg-blue-logo"
+        className="text-sm sm:text-base"
+      />
     </div>
   );
 }

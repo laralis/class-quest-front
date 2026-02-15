@@ -98,4 +98,4 @@ export interface Alternative {
   questionId: number;
 }
 
-export type TabType = "feed" | "students" | "history";
+export type TabType = "feed" | "students" | "history" | "generalGrade";

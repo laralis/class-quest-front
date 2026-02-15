@@ -18,11 +18,11 @@ export function QuestionnaireForm({
   const router = useRouter();
 
   return (
-    <div className="bg-white rounded-b-lg p-6 shadow-md mb-6">
-      <h2 className="text-xl font-bold mb-4 pb-2 border-b border-gray-200">
+    <div className="bg-white rounded-b-lg p-4 sm:p-6 shadow-md mb-4 sm:mb-6">
+      <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 pb-2 border-b border-gray-200">
         Informações do Questionário
       </h2>
-      <form className="space-y-6" onSubmit={formik.handleSubmit}>
+      <form className="space-y-4 sm:space-y-6" onSubmit={formik.handleSubmit}>
         <div>
           <InputText
             id="title"
@@ -55,18 +55,18 @@ export function QuestionnaireForm({
           )}
         </div>
 
-        <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white cursor-pointer transition-colors"
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white cursor-pointer transition-colors text-sm sm:text-base"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={formik.isSubmitting}
-            className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo cursor-pointer disabled:opacity-50 transition-colors"
+            className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo cursor-pointer disabled:opacity-50 transition-colors text-sm sm:text-base"
           >
             {formik.isSubmitting
               ? "Salvando..."

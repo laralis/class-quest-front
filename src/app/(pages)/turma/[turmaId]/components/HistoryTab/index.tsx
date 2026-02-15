@@ -23,7 +23,7 @@ export function HistoryTab() {
 
       try {
         const response = await fetch(
-          `http://localhost:3300/user-answer/student/${user.id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/user-answer/student/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -128,24 +128,24 @@ export function HistoryTab() {
     router.push("/historico");
   };
 
- 
-
   return (
     <div className="space-y-4">
       {results.map((result) => (
         <div
           key={result.questionnaireId}
-          className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
+          className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow"
         >
           <div className="flex justify-between items-start">
             <div className="flex-1">
-              <div className="flex items-center justify-between  mb-2 w-full">
+              <div className="flex items-center justify-between mb-2 w-full">
                 <div className="flex items-start gap-3 flex-col w-full">
-                  <div className="flex justify-between w-full">
-                    <h3 className="text-xl font-semibold text-blue-logo">
-                      {result.title}
+                  <div className="flex flex-col sm:flex-row sm:justify-between w-full gap-2 sm:gap-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <h3 className="text-lg sm:text-xl font-semibold text-blue-logo">
+                        {result.title}
+                      </h3>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        className={`px-3 py-1 rounded-full text-xs font-medium self-start ${
                           result.percentage >= 70
                             ? "bg-green-100 text-green-700"
                             : result.percentage >= 50
@@ -155,10 +155,12 @@ export function HistoryTab() {
                       >
                         {result.percentage}%
                       </span>
-                    </h3>
+                    </div>
                     <div>
-                      <p className="text-sm text-gray-500">Criado em</p>
-                      <p className="text-sm text-gray-700 mt-1">
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        Criado em
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-700 mt-1">
                         {new Date(result.createdAt).toLocaleDateString(
                           "pt-BR",
                           {
@@ -172,20 +174,27 @@ export function HistoryTab() {
                   </div>
 
                   <div>
-                    <p className="text-sm text-gray-500">Questões corretas</p>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      Questões corretas
+                    </p>
                     <div className="flex items-center gap-2 mt-1">
-                      <CheckCircleIcon size={20} className="text-green-600" />
-                      <span className="text-lg font-semibold text-gray-800">
+                      <CheckCircleIcon
+                        size={18}
+                        className="text-green-600 sm:w-5 sm:h-5"
+                      />
+                      <span className="text-base sm:text-lg font-semibold text-gray-800">
                         {result.correctAnswers} / {result.totalQuestions}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <p className="text-sm text-gray-500">Respondido em</p>
-                  <p className="text-sm text-gray-700 mt-1">
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    Respondido em
+                  </p>
+                  <p className="text-xs sm:text-sm text-gray-700 mt-1">
                     {new Date(result.responseDate).toLocaleDateString("pt-BR", {
                       day: "2-digit",
                       month: "2-digit",
@@ -196,10 +205,10 @@ export function HistoryTab() {
                   </p>
                 </div>
                 <Button
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
                   onClick={() => handleNavHistoric(result.questionnaireId)}
                 >
-                  <InfoIcon />
+                  <InfoIcon size={18} className="sm:w-5 sm:h-5" />
                   Ver detalhes
                 </Button>
               </div>

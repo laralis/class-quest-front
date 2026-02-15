@@ -14,7 +14,7 @@ interface Question {
 export function useQuestionsActions(
   fetchQuestions: () => void,
   questions: Question[],
-  setQuestions: (questions: Question[]) => void
+  setQuestions: (questions: Question[]) => void,
 ) {
   const { token } = useAuthStore();
 
@@ -55,16 +55,19 @@ export function useQuestionsActions(
   const updateQuestionsOrder = async (questions: Question[]) => {
     try {
       for (const question of questions) {
-        await fetch(`http://localhost:3300/question/${question.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/question/${question.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              order: question.order,
+            }),
           },
-          body: JSON.stringify({
-            order: question.order,
-          }),
-        });
+        );
       }
     } catch (error) {
       console.error("Erro ao atualizar ordem das perguntas:", error);
@@ -75,13 +78,13 @@ export function useQuestionsActions(
   const deleteQuestion = async (questionId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:3300/question/${questionId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/question/${questionId}`,
         {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -95,8 +98,6 @@ export function useQuestionsActions(
       toast.error("Erro ao conectar com o servidor");
     }
   };
-  
-  
 
   return {
     moveQuestionUp,

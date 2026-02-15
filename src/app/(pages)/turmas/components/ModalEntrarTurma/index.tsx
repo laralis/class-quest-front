@@ -26,14 +26,17 @@ export function ModalEntrarTurma({
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:3300/class/code", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/class/code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ accessCode }),
         },
-        body: JSON.stringify({ accessCode }),
-      });
+      );
 
       if (response.ok) {
         toast.success("Entrou na turma com sucesso!");

@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "react-toastify";
 import { Alternative, Question, Questionnaire } from "../../utils/types";
+import { ConfirmModal } from "@/app/components/ConfirmModal";
+import { useState } from "react";
 
 interface FeedTabProps {
   questionnaires: Questionnaire[];
@@ -15,6 +17,10 @@ interface FeedTabProps {
 export function FeedTab({ questionnaires }: FeedTabProps) {
   const { setActiveQuestionnaire, triggerRefresh } =
     useActiveQuestionnaireStore();
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [questionnaireToDelete, setQuestionnaireToDelete] = useState<
+    number | null
+  >(null);
   const { user, token } = useAuthStore();
   const router = useRouter();
 
@@ -29,7 +35,7 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
       toast.info("Carregando questionário...");
 
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${questionnaire.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire/${questionnaire.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -53,7 +59,7 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
           (data.questions || []).map(async (question: Question) => {
             try {
               const questionResponse = await fetch(
-                `http://localhost:3300/question/${question.id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/question/${question.id}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -107,14 +113,17 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
     }
   };
 
-  const handleDelete = async (qid: number) => {
-    if (!confirm("Tem certeza que deseja excluir este questionário?")) {
-      return;
-    }
+  const handleDelete = (qid: number) => {
+    setQuestionnaireToDelete(qid);
+    setIsConfirmModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (questionnaireToDelete === null) return;
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${qid}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire/${questionnaireToDelete}`,
         {
           method: "DELETE",
           headers: {
@@ -132,6 +141,9 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
     } catch (error) {
       console.error("Erro ao excluir questionário:", error);
       toast.error("Erro ao conectar com o servidor");
+    } finally {
+      setIsConfirmModalOpen(false);
+      setQuestionnaireToDelete(null);
     }
   };
 
@@ -140,7 +152,7 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
       toast.info("Carregando questionário...");
 
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${questionnaireId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire/${questionnaireId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -169,7 +181,7 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
           data.questions.map(async (question: Question) => {
             try {
               const questionResponse = await fetch(
-                `http://localhost:3300/question/${question.id}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/question/${question.id}`,
                 {
                   headers: {
                     Authorization: `Bearer ${token}`,
@@ -246,73 +258,85 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {filteredQuestionnaires.map((questionnaire) => (
-        <div
-          key={questionnaire.id}
-          className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow"
-        >
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-xl font-semibold text-blue-logo">
-                  {questionnaire.title}
-                </h3>
-                {isTeacher && (
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      questionnaire.ready
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {questionnaire.ready ? "Publicado" : "Rascunho"}
-                  </span>
-                )}
+    <>
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        setIsOpen={setIsConfirmModalOpen}
+        title={"Tem certeza que deseja excluir este questionário?"}
+        handleSuccess={confirmDelete}
+      />
+      <div className="space-y-4">
+        {filteredQuestionnaires.map((questionnaire) => (
+          <div
+            key={questionnaire.id}
+            className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow"
+          >
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+              <div className="flex-1 w-full">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                  <h3 className="text-lg sm:text-xl font-semibold text-blue-logo">
+                    {questionnaire.title}
+                  </h3>
+                  {isTeacher && (
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium self-start ${
+                        questionnaire.ready
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {questionnaire.ready ? "Publicado" : "Rascunho"}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm sm:text-base text-gray-600 mb-3">
+                  {questionnaire.description}
+                </p>
+                <p className="text-xs sm:text-sm text-gray-400">
+                  Criado em:{" "}
+                  {new Date(questionnaire.createdAt).toLocaleDateString(
+                    "pt-BR",
+                  )}
+                </p>
               </div>
-              <p className="text-gray-600 mb-3">{questionnaire.description}</p>
-              <p className="text-sm text-gray-400">
-                Criado em:{" "}
-                {new Date(questionnaire.createdAt).toLocaleDateString("pt-BR")}
-              </p>
+
+              {isTeacher && (
+                <div className="flex gap-2 self-end sm:self-start">
+                  <ButtonIcon
+                    onClick={() => {
+                      setActiveQuestionnaire(questionnaire as any);
+                      handleEdit(questionnaire);
+                    }}
+                    title="Editar questionário"
+                    className="text-blue-logo hover:bg-blue-50"
+                  >
+                    <PencilSimpleIcon size={20} />
+                  </ButtonIcon>
+                  <ButtonIcon
+                    onClick={() => {
+                      setActiveQuestionnaire(questionnaire as any);
+                      handleDelete(questionnaire.id);
+                    }}
+                    title="Excluir questionário"
+                    className="text-red-logo hover:bg-red-50"
+                  >
+                    <TrashIcon size={20} />
+                  </ButtonIcon>
+                </div>
+              )}
             </div>
 
-            {isTeacher && (
-              <div className="flex gap-2">
-                <ButtonIcon
-                  onClick={() => {
-                    setActiveQuestionnaire(questionnaire as any);
-                    handleEdit(questionnaire);
-                  }}
-                  title="Editar questionário"
-                  className="text-blue-logo hover:bg-blue-50"
-                >
-                  <PencilSimpleIcon size={20} />
-                </ButtonIcon>
-                <ButtonIcon
-                  onClick={() => {
-                    setActiveQuestionnaire(questionnaire as any);
-                    handleDelete(questionnaire.id);
-                  }}
-                  title="Excluir questionário"
-                  className="text-red-logo hover:bg-red-50"
-                >
-                  <TrashIcon size={20} />
-                </ButtonIcon>
-              </div>
+            {!isTeacher && (
+              <button
+                onClick={() => handleAnswer(questionnaire.id)}
+                className="mt-4 w-full bg-blue-logo text-white py-2 px-4 rounded-md hover:bg-purple-logo transition-colors text-sm sm:text-base"
+              >
+                Responder Questionário
+              </button>
             )}
           </div>
-
-          {!isTeacher && (
-            <button
-              onClick={() => handleAnswer(questionnaire.id)}
-              className="mt-4 w-full bg-blue-logo text-white py-2 px-4 rounded-md hover:bg-purple-logo transition-colors"
-            >
-              Responder Questionário
-            </button>
-          )}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+    </>
   );
 }

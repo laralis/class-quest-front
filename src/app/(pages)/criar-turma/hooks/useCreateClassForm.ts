@@ -16,14 +16,13 @@ export function useCreateClassForm() {
     initialValues: {
       name: "",
       description: "",
-      units: 1,
     },
     validationSchema: toFormikValidationSchema(createClassSchema),
     validateOnChange: true,
     validateOnBlur: true,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        await createClass(values, token!);
+        await createClass(values, classImage, token!);
         notifySuccess();
         setTimeout(() => {
           router.push("/turmas");
@@ -33,7 +32,7 @@ export function useCreateClassForm() {
         notifyError(
           error instanceof Error
             ? error.message
-            : "Erro ao conectar com o servidor"
+            : "Erro ao conectar com o servidor",
         );
       } finally {
         setSubmitting(false);

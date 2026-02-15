@@ -76,3 +76,22 @@ export interface TeacherQuestionnaireHistory {
   answeredCount: number;
   students: StudentGrade[];
 }
+
+export interface QuestionnaireGrade {
+  questionnaireId: number;
+  questionnaireTitle: string;
+  earnedPoints: number;
+  totalPoints: number;
+  percentage: number;
+}
+
+export interface StudentGradeData {
+  studentId: number;
+  classId: number;
+  questionnaires: QuestionnaireGrade[];
+  totalEarnedPoints: number;
+  totalPossiblePoints: number;
+  finalGrade: number;
+  studentName: string;
+  studentEmail: string;
+}

@@ -48,10 +48,12 @@ export function QuestionsList({
   isSubmitting,
 }: QuestionsListProps) {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-md mb-6">
-      <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-200">
-        <h2 className="text-xl font-bold">Perguntas do Questionário</h2>
-        <span className="text-sm text-gray-500">
+    <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md mb-4 sm:mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-2 border-b border-gray-200 gap-2">
+        <h2 className="text-lg sm:text-xl font-bold">
+          Perguntas do questionário
+        </h2>
+        <span className="text-xs sm:text-sm text-gray-500">
           {questions.length} {questions.length === 1 ? "pergunta" : "perguntas"}
         </span>
       </div>
@@ -59,9 +61,9 @@ export function QuestionsList({
       <Button
         type="button"
         onClick={onAddQuestion}
-        className="flex items-center gap-2 bg-blue-logo text-white px-4 py-2 rounded-md hover:bg-purple-logo mb-4 transition-colors"
+        className="flex items-center justify-center gap-2 bg-blue-logo text-white px-3 sm:px-4 py-2 rounded-md hover:bg-purple-logo mb-4 transition-colors w-full sm:w-auto text-sm sm:text-base"
       >
-        <PlusIcon size={20} weight="bold" />
+        <PlusIcon size={18} weight="bold" className="sm:w-5 sm:h-5" />
         Adicionar nova pergunta
       </Button>
 
@@ -70,31 +72,31 @@ export function QuestionsList({
           questions.map((question, index) => (
             <div
               key={question.id}
-              className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-blue-logo transition-colors"
+              className="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 hover:border-blue-logo transition-colors"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="bg-blue-logo text-white px-3 py-1 rounded-full text-sm font-semibold">
+              <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-3">
+                <div className="flex-1 w-full">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                    <span className="bg-blue-logo text-white px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
                       #{index + 1}
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-xs sm:text-sm text-gray-600">
                       {question.value}{" "}
                       {question.value === 1 ? "ponto" : "pontos"}
                     </span>
                     {question.time && (
-                      <span className="text-sm text-gray-600">
+                      <span className="text-xs sm:text-sm text-gray-600">
                         ⏱ {question.time}s
                       </span>
                     )}
                   </div>
-                  <h3 className="font-medium text-gray-800 mb-3">
+                  <h3 className="text-sm sm:text-base font-medium text-gray-800 mb-3">
                     {question.statement}
                   </h3>
 
                   {question.alternatives &&
                     question.alternatives.length > 0 && (
-                      <div className="space-y-2 ml-6 mt-3">
+                      <div className="space-y-2 ml-3 sm:ml-6 mt-3">
                         {question.alternatives.map((alt, altIndex) => (
                           <div
                             key={alt.id}
@@ -127,7 +129,7 @@ export function QuestionsList({
                     )}
                 </div>
 
-                <div className="flex gap-2 ml-4">
+                <div className="flex gap-2 sm:ml-4 self-end sm:self-start">
                   <div className="flex flex-col">
                     <ButtonIcon
                       type="button"
@@ -135,7 +137,7 @@ export function QuestionsList({
                       onClick={() => onMoveUp(index)}
                       disabled={index === 0}
                     >
-                      <CaretUpIcon size={20} />
+                      <CaretUpIcon size={18} className="sm:w-5 sm:h-5" />
                     </ButtonIcon>
                     <ButtonIcon
                       type="button"
@@ -143,7 +145,7 @@ export function QuestionsList({
                       onClick={() => onMoveDown(index)}
                       disabled={index === questions.length - 1}
                     >
-                      <CaretDownIcon size={20} />
+                      <CaretDownIcon size={18} className="sm:w-5 sm:h-5" />
                     </ButtonIcon>
                   </div>
                   <ButtonIcon
@@ -151,7 +153,7 @@ export function QuestionsList({
                     title="Editar pergunta"
                     onClick={() => onEditQuestion(question.id)}
                   >
-                    <PencilSimpleIcon size={20} />
+                    <PencilSimpleIcon size={18} className="sm:w-5 sm:h-5" />
                   </ButtonIcon>
                   <ButtonIcon
                     type="button"
@@ -159,7 +161,7 @@ export function QuestionsList({
                     onClick={() => onDeleteQuestion(question.id, index)}
                     className="text-red-logo"
                   >
-                    <TrashIcon size={20} />
+                    <TrashIcon size={18} className="sm:w-5 sm:h-5" />
                   </ButtonIcon>
                 </div>
               </div>
@@ -175,14 +177,14 @@ export function QuestionsList({
         )}
       </section>
 
-      <div className="flex justify-between items-center pt-6 mt-6 border-t border-gray-200">
-        <div className="flex items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 sm:pt-6 mt-4 sm:mt-6 border-t border-gray-200 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+          <label className="text-xs sm:text-sm font-medium text-gray-700">
             Status do questionário:
           </label>
           <div className="flex items-center gap-2">
             <span
-              className={`text-sm ${
+              className={`text-xs sm:text-sm ${
                 !isReady ? "font-semibold text-blue-logo" : "text-gray-500"
               }`}
             >
@@ -215,7 +217,7 @@ export function QuestionsList({
               />
             </button>
             <span
-              className={`text-sm ${
+              className={`text-xs sm:text-sm ${
                 isReady ? "font-semibold text-green-logo" : "text-gray-500"
               }`}
             >
@@ -225,7 +227,7 @@ export function QuestionsList({
         </div>
 
         {questions.length === 0 && (
-          <p className="text-sm text-orange-600">
+          <p className="text-xs sm:text-sm text-orange-600">
             ⚠️ Adicione pelo menos uma pergunta
           </p>
         )}

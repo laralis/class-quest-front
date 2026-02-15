@@ -93,7 +93,7 @@ export default function CriarQuestionario() {
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${activeQuestionnaire?.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire/${activeQuestionnaire?.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -175,7 +175,7 @@ export default function CriarQuestionario() {
 
     try {
       const response = await fetch(
-        `http://localhost:3300/questionnaire/${questionnaireId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/questionnaire/${questionnaireId}`,
         {
           method: "PUT",
           headers: {
@@ -216,7 +216,7 @@ export default function CriarQuestionario() {
     router.back();
   };
   return (
-    <Container className="text-blue-logo mt-6 max-w-3xl">
+    <Container className="text-blue-logo mt-4 sm:mt-6 max-w-3xl px-4 sm:px-6">
       <Modal
         type="add"
         isOpen={isModalAddOpen}
@@ -238,19 +238,19 @@ export default function CriarQuestionario() {
         questionId={editingQuestionId}
       />
 
-      <div className="flex gap-2 items-center bg-blue-logo p-4 text-white rounded-t-lg">
+      <div className="flex gap-2 items-center bg-blue-logo p-3 sm:p-4 text-white rounded-t-lg">
         <button
           onClick={handleGoBack}
-          className="hover:bg-logo-bege p-2 rounded-md cursor-pointer"
+          className="hover:bg-logo-bege p-1.5 sm:p-2 rounded-md cursor-pointer"
         >
-          <CaretLeftIcon size={22} />
+          <CaretLeftIcon size={20} className="sm:w-[22px] sm:h-[22px]" />
         </button>
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
             {isEditing ? "Editar questionário" : "Novo questionário"}
           </h1>
 
-          <p className="text-sm opacity-90">
+          <p className="text-xs sm:text-sm opacity-90">
             Turma: {currentClassDetails.name}
           </p>
         </div>
@@ -273,15 +273,28 @@ export default function CriarQuestionario() {
       )}
 
       {!activeQuestionnaire?.id && !isEditing && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-          <p className="text-blue-700 font-medium">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 text-center">
+          <p className="text-sm sm:text-base text-blue-700 font-medium">
             💡 Salve o rascunho do questionário para começar a adicionar
             perguntas
           </p>
         </div>
       )}
 
-      <ToastContainer position="bottom-right" />
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        progressClassName="!bg-blue-logo"
+        className="text-sm sm:text-base"
+      />
     </Container>
   );
 }

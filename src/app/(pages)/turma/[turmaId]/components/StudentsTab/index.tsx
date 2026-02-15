@@ -3,12 +3,15 @@
 import { Button } from "@/app/components/Button";
 import { ModalAdicionarTurma } from "../ModalAdicionarTurma";
 import { useState } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface StudentsTabProps {
   students: any[];
 }
 
 export function StudentsTab({ students }: StudentsTabProps) {
+  const { user } = useAuthStore();
+  const isTeacher = user?.role === "teacher";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleJoinClass = () => {
@@ -31,27 +34,41 @@ export function StudentsTab({ students }: StudentsTabProps) {
   return (
     <>
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6">
-          <div className="flex justify-between">
-            <h2 className="text-xl font-semibold mb-4">Alunos matriculados</h2>
-            <Button onClick={handleJoinClass}>Adicionar novo aluno</Button>
+        <div className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
+              Alunos matriculados
+            </h2>
+            {isTeacher && (
+              <Button
+                onClick={handleJoinClass}
+                className="text-sm sm:text-base"
+              >
+                Adicionar novo aluno
+              </Button>
+            )}
           </div>
           <div className="divide-y">
             {students.length === 0 ? (
-              <span className="text-gray-600">
+              <span className="text-sm sm:text-base text-gray-600">
                 Nenhum aluno foi matriculado
               </span>
             ) : (
               students.map((enrollment) => (
-                <div key={enrollment.id} className="py-4 flex items-center">
-                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-gray-600 font-medium">
+                <div
+                  key={enrollment.id}
+                  className="py-3 sm:py-4 flex items-center"
+                >
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3 sm:mr-4">
+                    <span className="text-sm sm:text-base text-gray-600 font-medium">
                       {enrollment.student.name.charAt(0)}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-medium">{enrollment.student.name}</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="text-sm sm:text-base font-medium">
+                      {enrollment.student.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500">
                       {enrollment.student.email}
                     </p>
                     {enrollment.student.registration && (

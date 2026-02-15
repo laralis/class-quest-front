@@ -28,17 +28,20 @@ export function ModalAdicionarTurma({
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:3300/class/student-mail`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/class/student-mail`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            classId: currentClassDetails.id,
+            studentEmail: studentEmail,
+          }),
         },
-        body: JSON.stringify({
-          classId: currentClassDetails.id,
-          studentEmail: studentEmail,
-        }),
-      });
+      );
 
       if (response.ok) {
         toast.success("Aluno adicionado com sucesso!");

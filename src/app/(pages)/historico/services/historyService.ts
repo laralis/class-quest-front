@@ -56,7 +56,6 @@ export async function getAllGrades(token: string, classId: number | null) {
     );
 
     if (!response.ok) {
-      console.log("Erro ao buscar notas");
       throw new Error("Erro ao buscar notas");
     }
 

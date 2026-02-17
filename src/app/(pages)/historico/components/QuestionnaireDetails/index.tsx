@@ -18,10 +18,9 @@ export function QuestionnaireDetails({ details }: QuestionnaireDetailsProps) {
   const firstQuestion = details[0];
   const questionnaire = firstQuestion.questionnaire;
 
-  // Calcular estatísticas
   const totalValue = details.reduce((sum, q) => sum + q.value, 0);
   const earnedValue = details.reduce((sum, q) => {
-    const userAnswer = q.userAnswers[q.userAnswers.length - 1]; // Última resposta
+    const userAnswer = q.userAnswers[q.userAnswers.length - 1];
     if (!userAnswer) return sum;
 
     const selectedAlternative = q.alternative.find(

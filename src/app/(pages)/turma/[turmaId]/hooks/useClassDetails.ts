@@ -22,7 +22,6 @@ export function useClassDetails(accessCode: string) {
     setLoading(true);
     try {
       const data = await fetchClassByAccessCode(accessCode, token);
-      console.log(data);
       setCurrentClass({
         id: data.id,
         logoUrl: data.logoUrl,

@@ -50,8 +50,23 @@ export function useQuestionnaireActions() {
         triggerRefresh();
         return true;
       } else {
-        const error = await response.json();
-        toast.error(error.message || "Erro ao atualizar questionário");
+        if (response.status === 404) {
+          toast.error("Questionário não encontrado. Por favor, crie um novo.");
+          return false;
+        }
+
+        try {
+          const error = await response.json();
+          const errorMessage =
+            error.message || "Erro ao atualizar questionário";
+          toast.error(
+            errorMessage.length > 100
+              ? "Erro ao atualizar questionário"
+              : errorMessage,
+          );
+        } catch {
+          toast.error("Erro ao atualizar questionário");
+        }
         return false;
       }
     } catch (error) {
@@ -103,7 +118,7 @@ export function useQuestionnaireActions() {
           ? "Questionário criado e publicado com sucesso!"
           : "Questionário criado como rascunho!";
         toast.success(statusMessage);
-        triggerRefresh(); // Atualiza a lista
+        triggerRefresh();
         return true;
       } else {
         const error = await response.json();

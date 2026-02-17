@@ -15,7 +15,7 @@ interface FeedTabProps {
 }
 
 export function FeedTab({ questionnaires }: FeedTabProps) {
-  const { setActiveQuestionnaire, triggerRefresh } =
+  const { setActiveQuestionnaire, clearActiveQuestionnaire, triggerRefresh } =
     useActiveQuestionnaireStore();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [questionnaireToDelete, setQuestionnaireToDelete] = useState<
@@ -104,7 +104,6 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
         questions: questionsWithAlternatives.sort((a, b) => a.order - b.order),
       };
 
-      console.log("Setting activeQuestionnaire:", questionnaireData);
       setActiveQuestionnaire(questionnaireData);
       router.push("/criar-questionario");
     } catch (error) {
@@ -134,6 +133,7 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
 
       if (response.ok) {
         toast.success("Questionário excluído com sucesso");
+        clearActiveQuestionnaire();
         triggerRefresh();
       } else {
         toast.error("Erro ao excluir questionário");

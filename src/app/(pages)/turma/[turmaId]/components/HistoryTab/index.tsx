@@ -38,7 +38,6 @@ export function HistoryTab() {
         }
 
         const data: UserAnswer[] = await response.json();
-        console.log("Respostas do usuário:", data);
 
         const groupedByQuestionnaire = data.reduce(
           (acc, answer) => {

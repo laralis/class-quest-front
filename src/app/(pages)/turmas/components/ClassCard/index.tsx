@@ -15,7 +15,6 @@ export function ClassCard({ classData }: ClassCardProps) {
     navigator.clipboard.writeText(code);
     notifyCodeCopied();
   };
-  console.log(classData.logoUrl);
 
   return (
     <Link

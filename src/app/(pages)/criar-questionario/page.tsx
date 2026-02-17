@@ -1,7 +1,7 @@
 "use client";
 import { Container } from "@/app/components/Container";
 import { CaretLeftIcon } from "@phosphor-icons/react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useLayoutEffect } from "react";
 import { useClassStore } from "@/store/useClassStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useActiveQuestionnaireStore } from "@/store/useActiveQuestionnaireStore";
@@ -64,9 +64,10 @@ export default function CriarQuestionario() {
 
   const formik = useFormik({
     initialValues: {
-      title: "",
-      description: "",
+      title: activeQuestionnaire?.title || "",
+      description: activeQuestionnaire?.description || "",
     },
+    enableReinitialize: true,
     validationSchema: toFormikValidationSchema(questionnaireSchema),
     validateOnChange: true,
     validateOnBlur: true,
@@ -87,6 +88,26 @@ export default function CriarQuestionario() {
       }
     },
   });
+
+  useEffect(() => {
+    return () => {
+      if (!activeQuestionnaire?.id) {
+        clearActiveQuestionnaire();
+      }
+    };
+  }, [activeQuestionnaire?.id, clearActiveQuestionnaire]);
+
+  useEffect(() => {
+    if (!activeQuestionnaire) {
+      formik.resetForm({
+        values: {
+          title: "",
+          description: "",
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestionnaire]);
 
   const fetchQuestions = useCallback(async () => {
     if (!activeQuestionnaire?.id || !token) return;
@@ -117,14 +138,9 @@ export default function CriarQuestionario() {
     }
   }, [activeQuestionnaire?.id, token]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (activeQuestionnaire?.id) {
       setIsEditing(true);
-      formik.setFieldValue("title", activeQuestionnaire.title);
-      formik.setFieldValue(
-        "description",
-        activeQuestionnaire.description || "",
-      );
       setIsReady(activeQuestionnaire.ready || false);
 
       if (
@@ -137,10 +153,15 @@ export default function CriarQuestionario() {
       } else {
         fetchQuestions();
       }
-    } else if (!currentClassDetails.id) {
+    } else if (currentClassDetails.id) {
+      setIsEditing(false);
+      setQuestions([]);
+      setIsReady(false);
+    } else {
       router.push("/turmas");
     }
-  }, [activeQuestionnaire?.id, currentClassDetails.id, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestionnaire, currentClassDetails.id, router]);
 
   useEffect(() => {
     if (shouldRefreshQuestions && activeQuestionnaire?.id) {
@@ -256,7 +277,11 @@ export default function CriarQuestionario() {
         </div>
       </div>
 
-      <QuestionnaireForm formik={formik} isEditing={isEditing} />
+      <QuestionnaireForm
+        key={activeQuestionnaire?.id || "new"}
+        formik={formik}
+        isEditing={isEditing}
+      />
 
       {(activeQuestionnaire?.id || isEditing) && (
         <QuestionsList

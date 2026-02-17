@@ -26,7 +26,6 @@ export function TeacherHistoryPage() {
       setLoading(true);
       try {
         const data = await getAllGrades(token, currentClassDetails.id);
-        console.log("DATA", data);
         setStudentGrades(data || []);
       } catch (error) {
         console.error("Erro ao carregar histórico da turma:", error);

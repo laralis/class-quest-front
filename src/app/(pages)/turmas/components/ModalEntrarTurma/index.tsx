@@ -94,33 +94,33 @@ export function ModalEntrarTurma({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
-          <InputText
-            id="accessCode"
-            name="accessCode"
-            placeholder="Digite o código da turma"
-            text="Código da turma"
-            value={accessCode}
-            onChange={(e) => setAccessCode(e.target.value)}
-            required
-          />
+        <InputText
+          id="accessCode"
+          name="accessCode"
+          placeholder="Digite o código da turma"
+          text="Código da turma"
+          value={accessCode}
+          onChange={(e) => setAccessCode(e.target.value)}
+          required
+        />
 
-          <div className="flex justify-end gap-4 pt-4">
-            <button
-              type="button"
-              onClick={onRequestClose}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
-            >
-              Cancelar
-            </button>
-            <Button
-              type="submit"
-              disabled={loading || !accessCode}
-              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo disabled:bg-gray-300"
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </div>
-        </form>
+        <div className="flex justify-end gap-4 pt-4">
+          <button
+            type="button"
+            onClick={onRequestClose}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
+          >
+            Cancelar
+          </button>
+          <Button
+            type="submit"
+            disabled={loading || !accessCode}
+            className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo disabled:bg-gray-300"
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </Button>
+        </div>
+      </form>
     </ReactModal>
   );
 }

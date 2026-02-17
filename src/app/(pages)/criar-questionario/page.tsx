@@ -62,12 +62,14 @@ export default function CriarQuestionario() {
   const { updateQuestionnaire, createQuestionnaire } =
     useQuestionnaireActions();
 
+  // Estado inicial: se não há questionário, não está editando
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   const formik = useFormik({
     initialValues: {
       title: activeQuestionnaire?.title || "",
       description: activeQuestionnaire?.description || "",
     },
-    enableReinitialize: true,
     validationSchema: toFormikValidationSchema(questionnaireSchema),
     validateOnChange: true,
     validateOnBlur: true,
@@ -89,25 +91,53 @@ export default function CriarQuestionario() {
     },
   });
 
+  // Inicialização: define o estado inicial com base no activeQuestionnaire
   useEffect(() => {
-    return () => {
-      if (!activeQuestionnaire?.id) {
-        clearActiveQuestionnaire();
+    if (!hasInitialized) {
+      if (!activeQuestionnaire) {
+        setIsEditing(false);
+        setQuestions([]);
+        setIsReady(false);
       }
-    };
-  }, [activeQuestionnaire?.id, clearActiveQuestionnaire]);
-
-  useEffect(() => {
-    if (!activeQuestionnaire) {
-      formik.resetForm({
-        values: {
-          title: "",
-          description: "",
-        },
-      });
+      setHasInitialized(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuestionnaire]);
+  }, []);
+
+  // Carrega dados do questionário quando ele existe
+  useEffect(() => {
+    if (activeQuestionnaire?.id) {
+      setIsEditing(true);
+      setIsReady(activeQuestionnaire.ready || false);
+      formik.setValues({
+        title: activeQuestionnaire.title,
+        description: activeQuestionnaire.description,
+      });
+
+      if (
+        activeQuestionnaire.questions &&
+        activeQuestionnaire.questions.length > 0
+      ) {
+        setQuestions(
+          activeQuestionnaire.questions.sort((a, b) => a.order - b.order),
+        );
+      } else {
+        fetchQuestions();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestionnaire?.id]);
+
+  // Reseta apenas quando navegamos de um questionário existente para criar novo
+  useEffect(() => {
+    if (hasInitialized && !activeQuestionnaire) {
+      setIsEditing(false);
+      setQuestions([]);
+      setIsReady(false);
+      formik.resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestionnaire, hasInitialized]);
 
   const fetchQuestions = useCallback(async () => {
     if (!activeQuestionnaire?.id || !token) return;
@@ -138,30 +168,12 @@ export default function CriarQuestionario() {
     }
   }, [activeQuestionnaire?.id, token]);
 
-  useLayoutEffect(() => {
-    if (activeQuestionnaire?.id) {
-      setIsEditing(true);
-      setIsReady(activeQuestionnaire.ready || false);
-
-      if (
-        activeQuestionnaire.questions &&
-        activeQuestionnaire.questions.length > 0
-      ) {
-        setQuestions(
-          activeQuestionnaire.questions.sort((a, b) => a.order - b.order),
-        );
-      } else {
-        fetchQuestions();
-      }
-    } else if (currentClassDetails.id) {
-      setIsEditing(false);
-      setQuestions([]);
-      setIsReady(false);
-    } else {
+  // Verifica se há turma selecionada
+  useEffect(() => {
+    if (!currentClassDetails.id) {
       router.push("/turmas");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuestionnaire, currentClassDetails.id, router]);
+  }, [currentClassDetails.id, router]);
 
   useEffect(() => {
     if (shouldRefreshQuestions && activeQuestionnaire?.id) {
@@ -277,11 +289,7 @@ export default function CriarQuestionario() {
         </div>
       </div>
 
-      <QuestionnaireForm
-        key={activeQuestionnaire?.id || "new"}
-        formik={formik}
-        isEditing={isEditing}
-      />
+      <QuestionnaireForm formik={formik} isEditing={isEditing} />
 
       {(activeQuestionnaire?.id || isEditing) && (
         <QuestionsList

@@ -1,8 +1,10 @@
 "use client";
+import ReactModal from "react-modal";
 import { Button } from "@/app/components/Button";
 import { InputText } from "@/app/components/InputText";
+import { ButtonIcon } from "@/app/components/ButtonIcon";
 import { XIcon } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 interface ModalEntrarTurmaProps {
@@ -18,6 +20,21 @@ export function ModalEntrarTurma({
 }: ModalEntrarTurmaProps) {
   const [accessCode, setAccessCode] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    ReactModal.setAppElement("#app-root");
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,23 +72,28 @@ export function ModalEntrarTurma({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md relative">
-        <button
-          onClick={onRequestClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-        >
-          <XIcon size={24} />
-        </button>
-
-        <h2 className="text-2xl font-bold text-blue-logo mb-4">
+    <ReactModal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      shouldCloseOnEsc
+      overlayClassName="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"
+      className="relative z-[10000] w-full max-w-md max-h-[90vh] bg-white rounded-lg outline-none overflow-y-auto"
+    >
+      <div className="flex items-center justify-between p-6 pb-4">
+        <h2 className="text-2xl font-bold text-blue-logo">
           Entrar em uma turma
         </h2>
+        <ButtonIcon
+          onClick={onRequestClose}
+          className="hover:bg-gray-200"
+          aria-label="Fechar modal"
+        >
+          <XIcon size={24} />
+        </ButtonIcon>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
           <InputText
             id="accessCode"
             name="accessCode"
@@ -99,7 +121,6 @@ export function ModalEntrarTurma({
             </Button>
           </div>
         </form>
-      </div>
-    </div>
+    </ReactModal>
   );
 }

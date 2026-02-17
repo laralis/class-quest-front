@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const createClassSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Nome é obrigatório")
-    .min(3, "Nome deve ter no mínimo 3 caracteres"),
+  name: z.preprocess(
+    (val) => val || "",
+    z.string().min(3, "Nome é obrigatório e deve ter no mínimo 3 caracteres"),
+  ),
   description: z.preprocess((val) => val || "", z.string().optional()),
 });
 

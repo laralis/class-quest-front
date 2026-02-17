@@ -20,7 +20,7 @@ export function QuestionnaireForm({
   return (
     <div className="bg-white rounded-b-lg p-4 sm:p-6 shadow-md mb-4 sm:mb-6">
       <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 pb-2 border-b border-gray-200">
-        Informações do Questionário
+        Informações do questionário
       </h2>
       <form className="space-y-4 sm:space-y-6" onSubmit={formik.handleSubmit}>
         <div>

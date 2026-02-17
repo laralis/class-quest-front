@@ -1,16 +1,14 @@
 import ReactModal from "react-modal";
 import { XIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react";
-import { Container } from "../../../../components/Container";
 import { InputText } from "../../../../components/InputText";
 import { InputTextArea } from "@/app/components/InputTextArea";
 import { ButtonIcon } from "@/app/components/ButtonIcon";
 import { Button } from "@/app/components/Button";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { InputCheckbox } from "@/app/components/InputCheckbox";
 import { InputRadio } from "@/app/components/InputRadio";
-import { useAuthStore } from "@/store/useAuthStore";
-import { useQuestionStore } from "@/store/useQuestionStore";
-import { toast } from "react-toastify";
+import { useQuestionForm } from "../../hooks/useQuestionForm";
+import { FormField } from "../FormField";
 
 interface ModalProps {
   isOpen: boolean;
@@ -37,272 +35,36 @@ export function Modal({
     ReactModal.setAppElement("#app-root");
   }, []);
 
-  const [statement, setStatement] = useState("");
-  const [options, setOptions] = useState<string[]>([""]);
-  const [hasTimer, setHasTimer] = useState<boolean>(false);
-  const [timeSeconds, setTimeSeconds] = useState<number | "">("");
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [value, setValue] = useState<number>(1);
-  const [loading, setLoading] = useState(false);
-
-  const { token } = useAuthStore();
-  const { triggerRefresh } = useQuestionStore();
-
-  const addOption = () => {
-    if (options.length >= MAX_OPTIONS) return;
-    setOptions([...options, ""]);
-  };
-
-  const removeOption = (index: number) => {
-    if (selectedOption === index) {
-      setSelectedOption(null);
-    } else if (selectedOption !== null && selectedOption > index) {
-      setSelectedOption(selectedOption - 1);
-    }
-    setOptions(options.filter((_, i) => i !== index));
-  };
-
-  const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const resetForm = () => {
-    setStatement("");
-    setOptions([""]);
-    setHasTimer(false);
-    setTimeSeconds("");
-    setSelectedOption(null);
-    setValue(1);
-  };
-
   useEffect(() => {
-    if (type === "edit" && questionId && isOpen) {
-      fetchQuestionData();
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
     }
-  }, [type, questionId, isOpen]);
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
-  const fetchQuestionData = async () => {
-    if (!questionId || !token) return;
+  const { formik, isLoading, addOption, removeOption, handleOptionChange } =
+    useQuestionForm({
+      type: type as "add" | "edit",
+      questionnaireId,
+      questionsCount,
+      questionId,
+      onSuccess: onQuestionAdded,
+      onRequestClose,
+    });
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/question/${questionId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setStatement(data.statement);
-        setValue(data.value);
-        setHasTimer(!!data.time);
-        setTimeSeconds(data.time || "");
-
-        if (data.options && data.options.length > 0) {
-          setOptions(
-            data.options.map(
-              (opt: { text: string; correct: boolean }) => opt.text,
-            ),
-          );
-          const correctIndex = data.options.findIndex(
-            (opt: { text: string; correct: boolean }) => opt.correct,
-          );
-          setSelectedOption(correctIndex !== -1 ? correctIndex : null);
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao buscar dados da questão:", error);
-      toast.error("Erro ao carregar dados da questão");
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!questionnaireId && type === "add") {
-      toast.error("ID do questionário não encontrado");
-      return;
-    }
-
-    if (!statement.trim()) {
-      toast.error("O enunciado é obrigatório");
-      return;
-    }
-
-    if (selectedOption === null) {
-      toast.error("Selecione a alternativa correta");
-      return;
-    }
-
-    const filledOptions = options.filter((opt) => opt.trim() !== "");
-    if (filledOptions.length < 2) {
-      toast.error("Adicione pelo menos 2 alternativas");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      if (type === "edit" && questionId) {
-        const updateResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/question/${questionId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              statement,
-              value,
-              time: hasTimer && timeSeconds ? Number(timeSeconds) : null,
-            }),
-          },
-        );
-
-        if (!updateResponse.ok) {
-          const error = await updateResponse.json();
-          toast.error(error.message || "Erro ao atualizar pergunta");
-          setLoading(false);
-          return;
-        }
-
-        toast.success("Pergunta atualizada com sucesso!");
-        triggerRefresh();
-        resetForm();
-        onRequestClose();
-      } else {
-        const questionPayload = {
-          statement,
-          value,
-          available: true,
-          time: hasTimer && timeSeconds ? Number(timeSeconds) : null,
-          order: questionsCount + 1,
-          questionnaireId,
-        };
-
-        const questionResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/question`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(questionPayload),
-          },
-        );
-
-        const questionResponseText = await questionResponse.text();
-
-        if (!questionResponse.ok) {
-          try {
-            const error = JSON.parse(questionResponseText);
-            toast.error(
-              error.details || error.message || "Erro ao criar pergunta",
-            );
-          } catch {
-            toast.error("Erro ao criar pergunta: Erro no servidor");
-          }
-          setLoading(false);
-          return;
-        }
-
-        let questionData;
-        try {
-          questionData = JSON.parse(questionResponseText);
-        } catch {
-          toast.error("Erro ao processar resposta do servidor");
-          setLoading(false);
-          return;
-        }
-
-        const newQuestionId = questionData.id;
-
-        let optionsCreated = 0;
-
-        for (let i = 0; i < filledOptions.length; i++) {
-          try {
-            const optionData = {
-              text: filledOptions[i],
-              correct: i === selectedOption,
-              questionId: newQuestionId,
-            };
-
-            const optionResponse = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/alternative`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(optionData),
-              },
-            );
-
-            const responseText = await optionResponse.text();
-
-            if (optionResponse.ok) {
-              try {
-                JSON.parse(responseText);
-                optionsCreated++;
-              } catch {
-                optionsCreated++;
-              }
-            } else {
-              try {
-                const errorData = JSON.parse(responseText);
-                toast.error(
-                  `Erro ao criar alternativa ${i + 1}: ${
-                    errorData.message || "Erro desconhecido"
-                  }`,
-                );
-              } catch {
-                toast.error(
-                  `Erro ao criar alternativa ${i + 1}: Erro no servidor`,
-                );
-              }
-            }
-          } catch (optionError) {
-            toast.error(`Erro ao criar alternativa ${i + 1}`);
-          }
-        }
-
-        if (optionsCreated === filledOptions.length) {
-          toast.success("Pergunta adicionada com sucesso!");
-          triggerRefresh();
-          resetForm();
-          onQuestionAdded?.();
-          onRequestClose();
-        } else {
-          toast.warning(
-            `Pergunta criada, mas apenas ${optionsCreated} de ${filledOptions.length} alternativas foram adicionadas`,
-          );
-        }
-      }
-    } catch (error) {
-      console.error("Erro ao processar pergunta:", error);
-      toast.error("Erro ao conectar com o servidor");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const maxOptionsReached = options.length >= MAX_OPTIONS;
+  const maxOptionsReached = formik.values.options.length >= MAX_OPTIONS;
 
   return (
     <ReactModal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       shouldCloseOnEsc
-      overlayClassName="fixed inset-0 z-[9999] flex items-start justify-center bg-black/40 p-4 overflow-y-auto"
-      className="relative z-[10000] w-full max-w-[500px] bg-white border-bege-logo border-2 rounded-md mx-auto my-4 sm:mt-[5%] outline-none"
+      overlayClassName="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"
+      className="relative z-[10000] w-full max-w-[500px] max-h-[90vh] bg-white border-bege-logo border-2 rounded-md outline-none overflow-y-auto"
     >
       <div className="flex items-center justify-between bg-blue-logo p-3 sm:p-4 rounded-t-md text-white">
         <h2 className="font-bold text-lg sm:text-xl md:text-2xl">
@@ -317,49 +79,59 @@ export function Modal({
         </ButtonIcon>
       </div>
 
-      <Container>
-        <form
-          className="space-y-3 sm:space-y-4 p-3 sm:p-4"
-          onSubmit={handleSubmit}
+      <form
+        className="space-y-3 sm:space-y-4 p-3 sm:p-4"
+        onSubmit={formik.handleSubmit}
+      >
+        <FormField
+          error={formik.errors.statement}
+          touched={formik.touched.statement}
         >
           <InputTextArea
-            name="statement"
             id="statement"
             text="Enunciado"
             className="w-full bg-gray-50 border border-gray-200 rounded-md resize-none text-sm sm:text-base"
             placeholder="Enunciado da pergunta"
-            value={statement}
-            onChange={(e) => setStatement(e.target.value)}
-            required
+            {...formik.getFieldProps("statement")}
           />
+        </FormField>
 
+        <FormField error={formik.errors.value} touched={formik.touched.value}>
           <InputText
             type="number"
-            name="value"
             id="value"
             text="Valor da questão"
             placeholder="Pontos"
-            value={value}
-            onChange={(e) => setValue(Number(e.target.value))}
+            {...formik.getFieldProps("value")}
             step="0.5"
             min="0"
-            required
           />
+        </FormField>
 
-          <div className="space-y-3 sm:space-y-4">
-            <label className="block text-sm sm:text-base font-medium">
-              Alternativas
-            </label>
+        <div className="space-y-3 sm:space-y-4">
+          <label className="block text-sm sm:text-base font-medium">
+            Alternativas
+          </label>
+          <FormField
+            error={
+              typeof formik.errors.options === "string"
+                ? formik.errors.options
+                : undefined
+            }
+            touched={formik.touched.options}
+          >
             <div className="space-y-2">
-              {options.map((option, index) => (
+              {formik.values.options.map((option, index) => (
                 <div key={index} className="flex gap-2 items-center">
                   <InputText
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
+                    onBlur={formik.handleBlur}
+                    name={`options[${index}]`}
                     className="w-full bg-logo-bege border border-gray-200 text-sm sm:text-base"
                     placeholder={`Alternativa ${index + 1}`}
                   />
-                  {options.length > 1 && (
+                  {formik.values.options.length > 1 && (
                     <>
                       <ButtonIcon
                         type="button"
@@ -372,15 +144,22 @@ export function Modal({
 
                       <InputRadio
                         index={index}
-                        selectedOption={selectedOption}
-                        setSelectedOption={setSelectedOption}
+                        selectedOption={formik.values.selectedOption}
+                        setSelectedOption={(idx) =>
+                          formik.setFieldValue("selectedOption", idx)
+                        }
                       />
                     </>
                   )}
                 </div>
               ))}
             </div>
+          </FormField>
 
+          <FormField
+            error={formik.errors.selectedOption}
+            touched={formik.touched.selectedOption}
+          >
             <div className="flex items-center gap-4 mt-2">
               <Button
                 type="button"
@@ -401,56 +180,66 @@ export function Modal({
                 Adicionar opção
               </Button>
             </div>
-          </div>
+          </FormField>
+        </div>
 
-          <div className="flex flex-col gap-3 sm:gap-4 my-2">
-            <div className="flex items-center gap-3">
-              <label className="block text-sm sm:text-base font-medium">
-                Temporizador
-              </label>
-              <InputCheckbox
-                checked={hasTimer}
-                onChange={(e) => setHasTimer(e.target.checked)}
-              />
-            </div>
-
-            <InputText
-              type="number"
-              name="time"
-              id="time"
-              text="Tempo"
-              placeholder="Tempo em segundos"
-              value={timeSeconds}
-              onChange={(e) => {
-                const val =
-                  e.target.value === ""
-                    ? ""
-                    : Math.max(0, Number(e.target.value));
-                setTimeSeconds(val === "" ? "" : Number(val));
-              }}
-              className={`w-full sm:w-48 text-sm sm:text-base ${hasTimer ? "" : "hidden"}`}
+        <div className="flex flex-col gap-3 sm:gap-4 my-2">
+          <div className="flex items-center gap-3">
+            <label className="block text-sm sm:text-base font-medium">
+              Temporizador
+            </label>
+            <InputCheckbox
+              checked={formik.values.hasTimer}
+              onChange={(e) =>
+                formik.setFieldValue("hasTimer", e.target.checked)
+              }
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
-            <Button
-              type="button"
-              onClick={onRequestClose}
-              className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white text-sm sm:text-base w-full sm:w-auto"
-              disabled={loading}
+          {formik.values.hasTimer && (
+            <FormField
+              error={formik.errors.timeSeconds}
+              touched={formik.touched.timeSeconds}
             >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo disabled:opacity-50 text-sm sm:text-base w-full sm:w-auto"
-              disabled={loading}
-            >
-              {loading ? "Salvando..." : "Salvar"}
-            </Button>
-          </div>
-        </form>
-      </Container>
+              <InputText
+                type="number"
+                name="timeSeconds"
+                id="timeSeconds"
+                text="Tempo"
+                placeholder="Tempo em segundos"
+                value={formik.values.timeSeconds || ""}
+                onChange={(e) => {
+                  const val =
+                    e.target.value === ""
+                      ? null
+                      : Math.max(0, Number(e.target.value));
+                  formik.setFieldValue("timeSeconds", val);
+                }}
+                onBlur={formik.handleBlur}
+                className="w-full sm:w-48 text-sm sm:text-base"
+              />
+            </FormField>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4">
+          <Button
+            type="button"
+            onClick={onRequestClose}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white text-sm sm:text-base w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo disabled:opacity-50 text-sm sm:text-base w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            {isLoading ? "Salvando..." : "Salvar"}
+          </Button>
+        </div>
+      </form>
     </ReactModal>
   );
 }

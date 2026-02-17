@@ -4,6 +4,7 @@ import { Button } from "@/app/components/Button";
 import { ModalAdicionarTurma } from "../ModalAdicionarTurma";
 import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { PlusIcon } from "@phosphor-icons/react";
 
 interface StudentsTabProps {
   students: any[];
@@ -42,8 +43,13 @@ export function StudentsTab({ students }: StudentsTabProps) {
             {isTeacher && (
               <Button
                 onClick={handleJoinClass}
-                className="text-sm sm:text-base"
+                className="flex gap-2 items-center text-sm sm:text-base"
               >
+                <PlusIcon
+                  size={14}
+                  className="sm:w-[16px] sm:h-[16px]"
+                  color="white"
+                />
                 Adicionar novo aluno
               </Button>
             )}

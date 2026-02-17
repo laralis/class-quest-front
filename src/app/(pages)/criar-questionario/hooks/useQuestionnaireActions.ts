@@ -40,7 +40,6 @@ export function useQuestionnaireActions() {
       if (response.ok) {
         toast.success("Questionário atualizado com sucesso!");
 
-        // Atualizar o estado do questionário ativo
         setActiveQuestionnaire({
           ...activeQuestionnaire,
           title: values.title,

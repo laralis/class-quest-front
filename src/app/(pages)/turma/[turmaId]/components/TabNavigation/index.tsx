@@ -13,9 +13,7 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
   const tabs: { id: TabType; label: string }[] = [
     { id: "feed", label: "Feed" },
     { id: "students", label: "Alunos" },
-    ...(isStudent
-      ? [{ id: "history" as TabType, label: "Histórico" }]
-      : [{ id: "generalGrade" as TabType, label: "Nota e resumo" }]),
+    ...(isStudent ? [{ id: "history" as TabType, label: "Histórico" }] : []),
   ];
 
   return (
@@ -31,6 +29,8 @@ export function TabNavigation({ activeTab, onTabChange }: TabNavigationProps) {
                   ? "border-b-2 border-blue-600 text-blue-600"
                   : "text-gray-500"
               }`}
+              aria-label={`Abrir aba ${tab.label}`}
+              aria-current={activeTab === tab.id ? "page" : undefined}
             >
               {tab.label}
             </button>

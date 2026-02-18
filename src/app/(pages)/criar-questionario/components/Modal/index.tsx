@@ -72,8 +72,9 @@ export function Modal({
         </h2>
         <ButtonIcon
           onClick={onRequestClose}
-          className="hover:bg-red-logo"
+          className="hover:bg-red-100 text-red-600"
           aria-label="Fechar modal"
+          title="Fechar"
         >
           <XIcon size={20} weight="bold" className="sm:w-[22px] sm:h-[22px]" />
         </ButtonIcon>

@@ -1,4 +1,5 @@
 import { QuestionnaireHistory } from "../../utils/types";
+import { Button } from "@/app/components/Button";
 
 interface QuestionnaireListProps {
   questionnaires: QuestionnaireHistory[];
@@ -22,7 +23,7 @@ export function QuestionnaireList({
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">
-        Meu Histórico de Questionários
+        Meu histórico de questionários
       </h1>
 
       <div className="mb-6">
@@ -99,12 +100,13 @@ function QuestionnaireCard({
           Concluído em:{" "}
           {new Date(questionnaire.completedAt).toLocaleDateString("pt-BR")}
         </p>
-        <button
+        <Button
           onClick={() => onViewDetails(questionnaire.id)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+          className="!px-4 !py-2 !bg-blue-600 hover:!bg-blue-700 text-sm"
+          aria-label="Ver detalhes do questionário"
         >
-          Ver Detalhes
-        </button>
+          Ver detalhes
+        </Button>
       </div>
     </div>
   );

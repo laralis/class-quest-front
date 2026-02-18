@@ -4,6 +4,7 @@ import {
   TrashIcon,
   CaretUpIcon,
   CaretDownIcon,
+  TimerIcon,
 } from "@phosphor-icons/react";
 import { Button } from "@/app/components/Button";
 import { ButtonIcon } from "@/app/components/ButtonIcon";
@@ -86,7 +87,7 @@ export function QuestionsList({
                     </span>
                     {question.time && (
                       <span className="text-xs sm:text-sm text-gray-600">
-                        ⏱ {question.time}s
+                        <TimerIcon size={16} /> {question.time}s
                       </span>
                     )}
                   </div>
@@ -194,7 +195,7 @@ export function QuestionsList({
               type="button"
               onClick={() => onToggleReady(!isReady)}
               disabled={isSubmitting || questions.length === 0}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-logo focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-logo focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer ${
                 isReady ? "bg-green-logo" : "bg-gray-300"
               }`}
               title={
@@ -209,6 +210,8 @@ export function QuestionsList({
               aria-label={
                 isReady ? "Mover para rascunho" : "Publicar questionário"
               }
+              role="switch"
+              aria-checked={isReady}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

@@ -8,6 +8,7 @@ import { TeacherHistory } from "../TeacherHistory";
 import { useRouter } from "next/navigation";
 import { CaretLeftIcon } from "@phosphor-icons/react";
 import { StudentGradeData } from "../../utils/types";
+import { ButtonIcon } from "@/app/components/ButtonIcon";
 
 export function TeacherHistoryPage() {
   const { token } = useAuthStore();
@@ -52,12 +53,14 @@ export function TeacherHistoryPage() {
   return (
     <div className="p-4 md:p-10 max-w-[1250px] m-auto">
       <div className="flex gap-2 items-center mb-4 md:mb-6">
-        <button
+        <ButtonIcon
           onClick={handleGoBack}
-          className="hover:bg-logo-bege rounded-md cursor-pointer"
+          className="hover:bg-logo-bege"
+          title="Voltar"
+          aria-label="Voltar para página anterior"
         >
-          <CaretLeftIcon size={22} />
-        </button>
+          <CaretLeftIcon size={20} className="sm:w-[22px] sm:h-[22px]" />
+        </ButtonIcon>
         <h1 className="text-xl md:text-2xl font-bold">
           Histórico - {currentClassDetails.name}
         </h1>

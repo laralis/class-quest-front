@@ -36,7 +36,8 @@ export function SectionAddStudents() {
           <Button
             type="button"
             onClick={handleAddStudent}
-            className="hover:text-white bg-gradient-to-r hover:from-green-logo hover:to-blue-logo cursor-pointer "
+            className="hover:text-white bg-gradient-to-r hover:from-green-logo hover:to-blue-logo cursor-pointer text-sm sm:text-base whitespace-nowrap"
+            aria-label="Adicionar aluno"
           >
             Adicionar
           </Button>
@@ -46,14 +47,15 @@ export function SectionAddStudents() {
         {students.map((email) => (
           <button
             key={email}
-            className="flex items-center gap-2 bg-bege-logo text-blue-logo px-3 py-1 rounded-full text-sm cursor-pointer"
+            className="flex items-center gap-2 bg-bege-logo text-blue-logo px-3 py-1 rounded-full text-xs sm:text-sm cursor-pointer hover:bg-bege-logo/80 transition-colors"
             type="button"
             onClick={() => removeStudent(email)}
             aria-label={`Remover ${email}`}
+            title={`Remover ${email}`}
           >
             {email}
 
-            <XIcon size={12} weight="bold" />
+            <XIcon size={12} weight="bold" className="flex-shrink-0" />
           </button>
         ))}
       </section>

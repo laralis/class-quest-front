@@ -1,4 +1,5 @@
 import { CaretLeftIcon } from "@phosphor-icons/react";
+import { ButtonIcon } from "@/app/components/ButtonIcon";
 
 interface QuestionnaireHeaderProps {
   title: string;
@@ -14,12 +15,14 @@ export function QuestionnaireHeader({
   return (
     <div className="bg-blue-logo text-white p-3 md:p-6">
       <div className="flex items-center gap-2 md:gap-3 mb-1.5 md:mb-2">
-        <button
+        <ButtonIcon
           onClick={onBack}
-          className="hover:bg-logo-bege p-1.5 md:p-2 rounded-md transition-all active:scale-95"
+          className="hover:bg-logo-bege !p-1.5 md:!p-2"
+          title="Voltar"
+          aria-label="Voltar para turma"
         >
           <CaretLeftIcon size={20} className="md:w-[22px] md:h-[22px]" />
-        </button>
+        </ButtonIcon>
         <h1 className="text-base md:text-2xl font-bold line-clamp-2">
           {title}
         </h1>

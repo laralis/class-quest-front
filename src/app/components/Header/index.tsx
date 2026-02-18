@@ -4,6 +4,7 @@ import { SignOutIcon } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Button } from "../Button";
 
 export function Header() {
   const router = useRouter();
@@ -63,20 +64,17 @@ export function Header() {
           </div>
           {isAuthenticated && (
             <div className="p-2 sm:p-3 md:p-4">
-              <button
+              <Button
                 onClick={handleLogout}
-                className="text-black px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-md hover:bg-background transition cursor-pointer"
+                className="!text-black !px-2 sm:!px-3 md:!px-4 !py-1.5 sm:!py-2 hover:!bg-background !bg-transparent !border-0"
+                aria-label="Sair da conta"
                 title="Sair"
               >
-                <SignOutIcon
-                  className="inline-block sm:mr-2"
-                  size={20}
-                  alt="Sair"
-                />
+                <SignOutIcon className="inline-block sm:mr-2" size={20} />
                 <span className="hidden sm:inline text-sm md:text-base">
                   Sair
                 </span>
-              </button>
+              </Button>
             </div>
           )}
         </div>

@@ -1,7 +1,7 @@
 "use client";
 import { Container } from "@/app/components/Container";
 import { CaretLeftIcon } from "@phosphor-icons/react";
-import { useState, useEffect, useCallback, useLayoutEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useClassStore } from "@/store/useClassStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useActiveQuestionnaireStore } from "@/store/useActiveQuestionnaireStore";
@@ -17,6 +17,7 @@ import { QuestionnaireForm } from "./components/QuestionnaireForm";
 import { QuestionsList } from "./components/QuestionsList";
 import { useQuestionnaireActions } from "./hooks/useQuestionnaireActions";
 import { useQuestionsActions } from "./hooks/useQuestionsActions";
+import { ButtonIcon } from "@/app/components/ButtonIcon";
 
 const questionnaireSchema = z.object({
   title: z
@@ -62,7 +63,6 @@ export default function CriarQuestionario() {
   const { updateQuestionnaire, createQuestionnaire } =
     useQuestionnaireActions();
 
-  // Estado inicial: se não há questionário, não está editando
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const formik = useFormik({
@@ -91,7 +91,6 @@ export default function CriarQuestionario() {
     },
   });
 
-  // Inicialização: define o estado inicial com base no activeQuestionnaire
   useEffect(() => {
     if (!hasInitialized) {
       if (!activeQuestionnaire) {
@@ -101,10 +100,8 @@ export default function CriarQuestionario() {
       }
       setHasInitialized(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Carrega dados do questionário quando ele existe
   useEffect(() => {
     if (activeQuestionnaire?.id) {
       setIsEditing(true);
@@ -125,10 +122,8 @@ export default function CriarQuestionario() {
         fetchQuestions();
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeQuestionnaire?.id]);
 
-  // Reseta apenas quando navegamos de um questionário existente para criar novo
   useEffect(() => {
     if (hasInitialized && !activeQuestionnaire) {
       setIsEditing(false);
@@ -136,7 +131,6 @@ export default function CriarQuestionario() {
       setIsReady(false);
       formik.resetForm();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeQuestionnaire, hasInitialized]);
 
   const fetchQuestions = useCallback(async () => {
@@ -168,7 +162,6 @@ export default function CriarQuestionario() {
     }
   }, [activeQuestionnaire?.id, token]);
 
-  // Verifica se há turma selecionada
   useEffect(() => {
     if (!currentClassDetails.id) {
       router.push("/turmas");
@@ -272,12 +265,14 @@ export default function CriarQuestionario() {
       />
 
       <div className="flex gap-2 items-center bg-blue-logo p-3 sm:p-4 text-white rounded-t-lg">
-        <button
+        <ButtonIcon
           onClick={handleGoBack}
-          className="hover:bg-logo-bege p-1.5 sm:p-2 rounded-md cursor-pointer"
+          className="hover:bg-logo-bege"
+          title="Voltar"
+          aria-label="Voltar para página anterior"
         >
           <CaretLeftIcon size={20} className="sm:w-[22px] sm:h-[22px]" />
-        </button>
+        </ButtonIcon>
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
             {isEditing ? "Editar questionário" : "Novo questionário"}

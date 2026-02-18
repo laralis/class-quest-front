@@ -39,7 +39,7 @@ export function QuestionNavigation({
               <button
                 key={index}
                 onClick={() => onNavigateToQuestion(index)}
-                className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 text-xs md:text-sm font-medium transition-all active:scale-95 ${
+                className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex-shrink-0 text-xs md:text-sm font-medium transition-all active:scale-95 cursor-pointer ${
                   isCurrent
                     ? "bg-blue-logo text-white ring-2 ring-blue-300 shadow-md"
                     : isExpired
@@ -55,6 +55,7 @@ export function QuestionNavigation({
                       ? "Respondida"
                       : "Não respondida"
                 }
+                aria-label={`Questão ${index + 1}${isCurrent ? " (atual)" : ""}${isAnswered ? " (respondida)" : ""}${isExpired ? " (expirada)" : ""}`}
               >
                 {index + 1}
               </button>
@@ -67,7 +68,8 @@ export function QuestionNavigation({
         <button
           onClick={onPrevious}
           disabled={isFirstQuestion}
-          className="px-4 md:px-6 py-2.5 border-2 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm md:text-base font-medium active:scale-95"
+          className="px-4 md:px-6 py-2.5 border-2 border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm md:text-base font-medium active:scale-95 cursor-pointer"
+          aria-label="Questão anterior"
         >
           Anterior
         </button>
@@ -75,14 +77,16 @@ export function QuestionNavigation({
         {isLastQuestion ? (
           <button
             onClick={onSubmit}
-            className="px-4 md:px-6 py-2.5 bg-green-logo text-white rounded-lg hover:bg-green-600 transition-all text-sm md:text-base font-semibold shadow-md active:scale-95"
+            className="px-4 md:px-6 py-2.5 bg-green-logo text-white rounded-lg hover:bg-green-600 transition-all text-sm md:text-base font-semibold shadow-md active:scale-95 cursor-pointer"
+            aria-label="Enviar respostas do questionário"
           >
             Enviar Respostas
           </button>
         ) : (
           <button
             onClick={onNext}
-            className="px-4 md:px-6 py-2.5 bg-blue-logo text-white rounded-lg hover:bg-purple-logo transition-all text-sm md:text-base font-medium shadow-md active:scale-95"
+            className="px-4 md:px-6 py-2.5 bg-blue-logo text-white rounded-lg hover:bg-purple-logo transition-all text-sm md:text-base font-medium shadow-md active:scale-95 cursor-pointer"
+            aria-label="Próxima questão"
           >
             Próxima
           </button>

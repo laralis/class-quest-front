@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Class } from "../../utils/types";
 import { notifyCodeCopied } from "../../utils/notifications";
+import { ButtonIcon } from "@/app/components/ButtonIcon";
 
 interface ClassCardProps {
   classData: Class;
@@ -40,14 +41,14 @@ export function ClassCard({ classData }: ClassCardProps) {
             <div className="flex justify-center gap-2 text-xs sm:text-sm">
               <label htmlFor="code">Código:</label>
               <span id="code">{classData.accessCode}</span>
-              <button
-                onClick={(e) => handleCopyCode(classData.accessCode, e)}
-                className="p-1 cursor-pointer m-[-1px]"
-                aria-label="Copiar código"
+              <ButtonIcon
+                onClick={(e) => handleCopyCode(classData.accessCode, e as any)}
+                className="!p-1 m-[-1px]"
+                aria-label="Copiar código da turma"
                 title="Copiar código"
               >
                 <CopySimpleIcon size={18} />
-              </button>
+              </ButtonIcon>
             </div>
           </div>
         </div>

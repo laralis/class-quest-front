@@ -2,6 +2,7 @@ import { InputText } from "@/app/components/InputText";
 import { InputTextArea } from "@/app/components/InputTextArea";
 import { useRouter } from "next/navigation";
 import { FormikProps } from "formik";
+import { Button } from "@/app/components/Button";
 
 interface QuestionnaireFormProps {
   formik: FormikProps<{
@@ -56,24 +57,28 @@ export function QuestionnaireForm({
         </div>
 
         <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
-          <button
+          <Button
             type="button"
             onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-red-logo hover:text-white cursor-pointer transition-colors text-sm sm:text-base"
+            className="!bg-transparent !text-gray-700 hover:!bg-red-logo hover:!text-white text-sm sm:text-base"
+            aria-label="Cancelar e voltar"
           >
             Cancelar
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={formik.isSubmitting}
-            className="px-4 py-2 bg-blue-logo text-white rounded-md hover:bg-green-logo cursor-pointer disabled:opacity-50 transition-colors text-sm sm:text-base"
+            className="!bg-blue-logo hover:!bg-green-logo text-sm sm:text-base"
+            aria-label={
+              isEditing ? "Atualizar questionário" : "Salvar questionário"
+            }
           >
             {formik.isSubmitting
               ? "Salvando..."
               : isEditing
                 ? "Atualizar"
                 : "Salvar"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

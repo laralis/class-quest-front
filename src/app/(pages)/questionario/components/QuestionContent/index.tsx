@@ -47,9 +47,11 @@ export function QuestionContent({
                 disabled
                   ? "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
                   : selectedAnswer === alternative.id
-                    ? "border-blue-logo bg-blue-50"
-                    : "border-gray-200 hover:border-blue-200 active:border-blue-logo"
+                    ? "border-blue-logo bg-blue-50 cursor-pointer"
+                    : "border-gray-200 hover:border-blue-200 active:border-blue-logo cursor-pointer"
               }`}
+              aria-label={`Alternativa ${String.fromCharCode(65 + index)}: ${alternative.text}`}
+              aria-pressed={selectedAnswer === alternative.id}
             >
               <div className="flex items-start gap-2 md:gap-3">
                 <div

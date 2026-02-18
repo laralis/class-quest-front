@@ -80,20 +80,24 @@ export function ModalEntrarTurma({
       overlayClassName="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4"
       className="relative z-[10000] w-full max-w-md max-h-[90vh] bg-white rounded-lg outline-none overflow-y-auto"
     >
-      <div className="flex items-center justify-between p-6 pb-4">
-        <h2 className="text-2xl font-bold text-blue-logo">
+      <div className="flex items-center justify-between p-4 sm:p-6 pb-3 sm:pb-4">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-logo">
           Entrar em uma turma
         </h2>
         <ButtonIcon
           onClick={onRequestClose}
-          className="hover:bg-gray-200"
+          className="hover:bg-red-100 text-red-600"
           aria-label="Fechar modal"
+          title="Fechar"
         >
-          <XIcon size={24} />
+          <XIcon size={24} weight="bold" />
         </ButtonIcon>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6"
+      >
         <InputText
           id="accessCode"
           name="accessCode"

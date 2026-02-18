@@ -50,15 +50,16 @@ export function FloatingButtons() {
       />
       <Button
         onClick={handleDeleteClass}
-        className="fixed bottom-40 sm:bottom-44 right-4 sm:right-8 bg-gradient-to-r bg-red-logo text-white !p-3 sm:!p-4 !rounded-full shadow-lg hover:from-secondary-purple hover:to-purple-logo transition-all hover:scale-110 flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
+        className="fixed bottom-40 sm:bottom-40 right-4 sm:right-8 bg-gradient-to-r bg-red-logo text-white !p-3 sm:!p-4 !rounded-full shadow-lg hover:from-secondary-purple hover:to-purple-logo transition-all hover:scale-110 flex items-center gap-1 sm:gap-2 text-xs sm:text-base"
       >
         <TrashIcon size={20} weight="bold" className="sm:w-6 sm:h-6" />
         <span className="hidden sm:inline">Excluir turma</span>
       </Button>
       <button
         onClick={handleCreateQuestionnaire}
-        className="fixed bottom-8 right-4 sm:right-8 bg-gradient-to-r from-green-logo to-blue-logo text-white p-3 sm:p-4 rounded-full shadow-lg hover:from-secondary-purple hover:to-purple-logo transition-all hover:scale-110 flex items-center gap-1 sm:gap-2"
+        className="fixed bottom-8 right-4 sm:right-8 bg-gradient-to-r from-green-logo to-blue-logo text-white p-3 sm:p-4 rounded-full shadow-lg hover:from-secondary-purple hover:to-purple-logo transition-all hover:scale-110 flex items-center gap-1 sm:gap-2 cursor-pointer"
         title="Criar novo questionário"
+        aria-label="Criar novo questionário para esta turma"
       >
         <PlusIcon size={20} weight="bold" className="sm:w-6 sm:h-6" />
         <span className="pr-1 sm:pr-2 text-xs sm:text-base hidden sm:inline">
@@ -69,6 +70,7 @@ export function FloatingButtons() {
         href="/historico"
         className="fixed bottom-24 right-4 sm:right-8 bg-gradient-to-r from-green-logo to-blue-logo text-white p-3 sm:p-4 rounded-full shadow-lg hover:from-secondary-purple hover:to-purple-logo transition-all hover:scale-110 flex items-center gap-1 sm:gap-2"
         title="Ver histórico"
+        aria-label="Ver histórico de questionários"
       >
         <ListIcon size={20} weight="bold" className="sm:w-6 sm:h-6" />
         <span className="pr-1 sm:pr-2 text-xs sm:text-base hidden sm:inline">

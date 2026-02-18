@@ -58,13 +58,8 @@ export default function ClassDetail() {
       <ToastContainer
         position="bottom-right"
         autoClose={3000}
-        hideProgressBar={false}
         newestOnTop
-        closeOnClick
         rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
         theme="light"
         progressClassName="!bg-blue-logo"
         className="text-sm sm:text-base"

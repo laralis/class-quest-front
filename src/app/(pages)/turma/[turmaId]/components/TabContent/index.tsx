@@ -23,7 +23,6 @@ export function TabContent({ activeTab, classDetails }: TabContentProps) {
       )}
 
       {activeTab === "history" && isStudent && <HistoryTab />}
-      {activeTab === "generalGrade" && isStudent && <HistoryTab />}
     </main>
   );
 }

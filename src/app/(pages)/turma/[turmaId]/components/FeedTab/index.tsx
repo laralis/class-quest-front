@@ -1,14 +1,20 @@
 "use client";
 
-import { PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
+import { CheckIcon, PencilSimpleIcon, TrashIcon } from "@phosphor-icons/react";
 import { ButtonIcon } from "@/app/components/ButtonIcon";
+import { Button } from "@/app/components/Button";
 import { useActiveQuestionnaireStore } from "@/store/useActiveQuestionnaireStore";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "react-toastify";
-import { Alternative, Question, Questionnaire } from "../../utils/types";
+import {
+  Alternative,
+  Question,
+  Questionnaire,
+  UserAnswer,
+} from "../../utils/types";
 import { ConfirmModal } from "@/app/components/ConfirmModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface FeedTabProps {
   questionnaires: Questionnaire[];
@@ -21,10 +27,42 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
   const [questionnaireToDelete, setQuestionnaireToDelete] = useState<
     number | null
   >(null);
+  const [answeredQuestionnaireIds, setAnsweredQuestionnaireIds] = useState<
+    Set<number>
+  >(new Set());
   const { user, token } = useAuthStore();
   const router = useRouter();
 
   const isTeacher = user?.role === "teacher";
+
+  useEffect(() => {
+    const fetchAnsweredQuestionnaires = async () => {
+      if (!user?.id || !token || isTeacher) return;
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/user-answer/student/${user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (response.ok) {
+          const data: UserAnswer[] = await response.json();
+          const answeredIds = new Set<number>(
+            data.map((answer) => answer.question.questionnaireId),
+          );
+          setAnsweredQuestionnaireIds(answeredIds);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar questionários respondidos:", error);
+      }
+    };
+
+    fetchAnsweredQuestionnaires();
+  }, [user?.id, token, isTeacher]);
 
   const filteredQuestionnaires = isTeacher
     ? questionnaires
@@ -304,7 +342,6 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
                 <div className="flex gap-2 self-end sm:self-start">
                   <ButtonIcon
                     onClick={() => {
-                      setActiveQuestionnaire(questionnaire as any);
                       handleEdit(questionnaire);
                     }}
                     title="Editar questionário"
@@ -314,7 +351,6 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
                   </ButtonIcon>
                   <ButtonIcon
                     onClick={() => {
-                      setActiveQuestionnaire(questionnaire as any);
                       handleDelete(questionnaire.id);
                     }}
                     title="Excluir questionário"
@@ -327,12 +363,21 @@ export function FeedTab({ questionnaires }: FeedTabProps) {
             </div>
 
             {!isTeacher && (
-              <button
-                onClick={() => handleAnswer(questionnaire.id)}
-                className="mt-4 w-full bg-blue-logo text-white py-2 px-4 rounded-md hover:bg-purple-logo transition-colors text-sm sm:text-base"
-              >
-                Responder Questionário
-              </button>
+              <>
+                {answeredQuestionnaireIds.has(questionnaire.id) ? (
+                  <div className="mt-4 w-full bg-green-50 border border-green-200 text-green-700 py-3 px-4 rounded-md text-sm sm:text-base text-center font-medium">
+                    <CheckIcon size={16} /> Questionário já respondido
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => handleAnswer(questionnaire.id)}
+                    className="mt-4 w-full !bg-blue-logo hover:!bg-purple-logo !py-2 text-sm sm:text-base"
+                    aria-label="Responder questionário"
+                  >
+                    Responder Questionário
+                  </Button>
+                )}
+              </>
             )}
           </div>
         ))}

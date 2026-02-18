@@ -51,7 +51,7 @@ export function QuestionnaireDetails({ details }: QuestionnaireDetailsProps) {
 
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 items-stretch sm:items-center flex-wrap">
           <div className="bg-blue-50 px-3 md:px-4 py-2 rounded flex-1 sm:flex-initial">
-            <p className="text-xs md:text-sm text-gray-600">Nota Final</p>
+            <p className="text-xs md:text-sm text-gray-600">Nota final</p>
             <p className="text-xl md:text-2xl font-bold text-blue-600">
               {earnedValue.toFixed(1)}/{totalValue.toFixed(1)} (
               {percentage.toFixed(0)}%)
@@ -59,7 +59,7 @@ export function QuestionnaireDetails({ details }: QuestionnaireDetailsProps) {
           </div>
           <div className="bg-green-50 px-3 md:px-4 py-2 rounded flex-1 sm:flex-initial">
             <p className="text-xs md:text-sm text-gray-600">
-              Questões Corretas
+              Questões corretas
             </p>
             <p className="text-lg md:text-xl font-semibold text-green-600">
               {correctCount}/{details.length}
@@ -67,7 +67,7 @@ export function QuestionnaireDetails({ details }: QuestionnaireDetailsProps) {
           </div>
           <div className="bg-gray-50 px-3 md:px-4 py-2 rounded flex-1 sm:flex-initial">
             <p className="text-xs md:text-sm text-gray-600">
-              Total de Questões
+              Total de questões
             </p>
             <p className="text-lg md:text-xl font-semibold">{details.length}</p>
           </div>
@@ -76,7 +76,7 @@ export function QuestionnaireDetails({ details }: QuestionnaireDetailsProps) {
 
       <div className="space-y-3 md:space-y-4">
         <h2 className="text-lg md:text-xl font-bold px-1">
-          Detalhamento das Questões
+          Detalhamento das questões
         </h2>
         {details
           .sort((a, b) => a.order - b.order)

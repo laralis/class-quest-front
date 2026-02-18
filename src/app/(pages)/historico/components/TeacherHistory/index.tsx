@@ -142,7 +142,6 @@ export function TeacherHistory({ studentGrades }: TeacherHistoryProps) {
         </div>
       </div>
 
-      {/* Versão Mobile - Cards */}
       <div className="md:hidden space-y-4">
         <div className="bg-gray-50 rounded-lg p-4">
           <h2 className="text-lg font-bold text-gray-800">
@@ -160,7 +159,9 @@ export function TeacherHistory({ studentGrades }: TeacherHistoryProps) {
             >
               <button
                 onClick={() => toggleStudent(student.studentId)}
-                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer"
+                aria-label={`${isExpanded ? "Recolher" : "Expandir"} informações de ${student.studentName}`}
+                aria-expanded={isExpanded}
               >
                 <div className="flex-1 text-left">
                   <div className="font-semibold text-gray-800">
@@ -237,7 +238,6 @@ export function TeacherHistory({ studentGrades }: TeacherHistoryProps) {
         })}
       </div>
 
-      {/* Estatísticas Gerais */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         <div className="bg-white rounded-lg shadow-md p-4">
           <h3 className="text-xs md:text-sm font-semibold text-gray-600 mb-2">

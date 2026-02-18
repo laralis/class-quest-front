@@ -49,21 +49,23 @@ export function ConfirmModal({
         </h2>
         <ButtonIcon
           onClick={onRequestClose}
-          className="hover:bg-gray-200"
+          className="hover:bg-red-100 text-red-600"
           aria-label="Fechar modal"
+          title="Fechar"
         >
-          <XIcon size={20} className="sm:w-6 sm:h-6" />
+          <XIcon size={20} weight="bold" className="sm:w-6 sm:h-6" />
         </ButtonIcon>
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 px-4 sm:px-6 pb-4 sm:pb-6">
-        <button
+        <Button
           type="button"
           onClick={onRequestClose}
-          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 text-sm sm:text-base w-full sm:w-auto"
+          className="!bg-transparent !text-gray-700 hover:!bg-gray-100 text-sm sm:text-base w-full sm:w-auto"
+          aria-label="Cancelar ação"
         >
           Cancelar
-        </button>
+        </Button>
         <Button
           onClick={async () => {
             await handleSuccess();

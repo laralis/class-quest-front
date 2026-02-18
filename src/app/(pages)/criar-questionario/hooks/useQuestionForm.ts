@@ -62,7 +62,6 @@ export function useQuestionForm({
     if (type === "edit" && questionId && token) {
       fetchQuestionData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type, questionId, token]);
 
   const fetchQuestionData = async () => {

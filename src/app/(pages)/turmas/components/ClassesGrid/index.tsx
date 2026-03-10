@@ -43,7 +43,10 @@ export function ClassesGrid({ classes, onModalSuccess }: ClassesGridProps) {
           isTeacher={user?.role === "teacher"}
         />
         {classes.map((classData) => (
-          <ClassCard key={classData.id} classData={classData} />
+          <ClassCard
+            key={classData.id}
+            classData={classData}
+          />
         ))}
       </div>
       <ModalEntrarTurma

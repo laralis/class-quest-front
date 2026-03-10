@@ -1,7 +1,6 @@
-interface ButtonIconProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonIconProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 export function ButtonIcon({

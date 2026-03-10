@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useClasses } from "./hooks/useClasses";
@@ -8,7 +9,15 @@ export default function CriarTurma() {
   const { classes, loading, reloadClasses } = useClasses();
 
   if (loading) {
-    return <div className="p-10 text-center">Carregando...</div>;
+    return (
+      <div className="p-4 sm:p-6 md:p-10 max-w-[1250px] m-auto">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <p className="bg-white/90 rounded-lg px-4 py-2 text-center">
+            Carregando...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return (

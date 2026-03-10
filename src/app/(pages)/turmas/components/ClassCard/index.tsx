@@ -10,6 +10,8 @@ interface ClassCardProps {
 }
 
 export function ClassCard({ classData }: ClassCardProps) {
+  const imageSrc = classData.logoUrl || "/cover.jpg";
+
   const handleCopyCode = (code: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -23,11 +25,15 @@ export function ClassCard({ classData }: ClassCardProps) {
       href={`/turma/${classData.accessCode}`}
     >
       <Image
-        src={classData.logoUrl || "/cover.jpg"}
+        src={imageSrc}
         alt="Capa"
         width={200}
         height={200}
-        className="object-cover w-full h-full rounded-lg relative blur-[2px]"
+        fetchPriority={"auto"}
+        loading={"lazy"}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        quality={70}
+        className="object-cover w-full h-full rounded-lg relative"
       />
       <div className="absolute inset-0 flex flex-col justify-center w-fit mx-auto">
         <div
@@ -42,7 +48,7 @@ export function ClassCard({ classData }: ClassCardProps) {
               <label htmlFor="code">Código:</label>
               <span id="code">{classData.accessCode}</span>
               <ButtonIcon
-                onClick={(e) => handleCopyCode(classData.accessCode, e as any)}
+                onClick={(e) => handleCopyCode(classData.accessCode, e)}
                 className="!p-1 m-[-1px]"
                 aria-label="Copiar código da turma"
                 title="Copiar código"

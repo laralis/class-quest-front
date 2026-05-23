@@ -31,12 +31,12 @@ export function QuestionContent({
       )}
 
       <div className="mb-4 md:mb-6">
-        <h2 className="text-base md:text-xl font-semibold text-gray-800 leading-relaxed">
+        <h2 className="text-base md:text-xl font-semibold text-gray-800 leading-relaxed select-none">
           {statement}
         </h2>
       </div>
 
-      <div className="space-y-2 md:space-y-3">
+      <div className="space-y-2 md:space-y-3 select-none">
         {alternatives && alternatives.length > 0 ? (
           alternatives.map((alternative, index) => (
             <button
